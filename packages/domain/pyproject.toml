@@ -1,0 +1,10 @@
+[project]
+name = "holm-domain"
+version = "0.1.0rc1"
+description = "Framework-independent Private AI Workspace domain boundary"
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[build-system]
+requires = ["uv_build==0.11.7"]
+build-backend = "uv_build"

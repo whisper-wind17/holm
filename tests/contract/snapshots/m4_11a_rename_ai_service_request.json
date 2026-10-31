@@ -1,0 +1,29 @@
+{
+  "additionalProperties": false,
+  "description": "Explicit confirmation and observed version for a public route identity change.",
+  "properties": {
+    "public_model_name": {
+      "maxLength": 64,
+      "minLength": 2,
+      "pattern": "^[a-z0-9._-]{2,64}$",
+      "title": "Public Model Name",
+      "type": "string"
+    },
+    "confirm_public_model_name": {
+      "title": "Confirm Public Model Name",
+      "type": "string"
+    },
+    "expected_route_version": {
+      "minimum": 1,
+      "title": "Expected Route Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "public_model_name",
+    "confirm_public_model_name",
+    "expected_route_version"
+  ],
+  "title": "RenameAiServiceRequest",
+  "type": "object"
+}

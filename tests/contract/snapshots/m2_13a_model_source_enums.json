@@ -1,0 +1,37 @@
+{
+  "ModelSourceConfigurationState": [
+    "unconfigured",
+    "configured",
+    "key_unavailable"
+  ],
+  "ModelSourceType": [
+    "Hugging Face",
+    "ModelScope"
+  ],
+  "ModelSourceValidationAction": [
+    "update_credential",
+    "check_source_access",
+    "check_source_reference",
+    "check_source_reference_and_configure_credential",
+    "retry_later",
+    "install_validator"
+  ],
+  "ModelSourceValidationReason": [
+    "credential_valid",
+    "credential_invalid",
+    "source_permission_denied",
+    "source_not_found",
+    "source_not_found_or_inaccessible",
+    "source_rate_limited",
+    "validator_unavailable",
+    "validation_timeout",
+    "validation_failed"
+  ],
+  "ModelSourceValidationStatus": [
+    "accessible",
+    "invalid_credential",
+    "permission_denied",
+    "not_found",
+    "rate_limited"
+  ]
+}

@@ -1,0 +1,47 @@
+[
+  {
+    "model_name": "Qwen/Qwen2.5-0.5B-Instruct",
+    "occupied": [],
+    "expected": "Qwen2.5-0.5B-Instruct"
+  },
+  {
+    "model_name": "Qwen/Qwen2.5-0.5B-Instruct",
+    "occupied": [
+      "Qwen2.5-0.5B-Instruct",
+      "Qwen2.5-0.5B-Instruct-2"
+    ],
+    "expected": "Qwen2.5-0.5B-Instruct-3"
+  },
+  {
+    "model_name": "plain",
+    "occupied": [],
+    "expected": "plain"
+  },
+  {
+    "model_name": "org/nested/  模型 😀  ",
+    "occupied": [],
+    "expected": "模型 😀"
+  },
+  {
+    "model_name": "org/𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷",
+    "occupied": [
+      "𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷"
+    ],
+    "expected": "𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷𠮷-2"
+  },
+  {
+    "model_name": "org/x",
+    "occupied": [],
+    "expected": "模型实例"
+  },
+  {
+    "model_name": "org/ ",
+    "occupied": [],
+    "expected": "模型实例"
+  },
+  {
+    "model_name": "org/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa b",
+    "occupied": [],
+    "expected": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  }
+]

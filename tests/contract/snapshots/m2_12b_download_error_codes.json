@@ -1,0 +1,19 @@
+[
+  "artifact_file_list_invalid",
+  "artifact_manifest_hash_failed",
+  "artifact_publish_failed",
+  "artifact_required_files_invalid",
+  "artifact_runtime_incompatible",
+  "artifact_safetensors_invalid",
+  "artifact_unsafe_file",
+  "download_process_failed",
+  "download_task_identity_mismatch",
+  "download_task_state_mismatch",
+  "duplicate_resolved_revision",
+  "external_path_unreadable",
+  "insufficient_storage",
+  "model_layout_unsupported",
+  "remote_code_not_allowed",
+  "staging_cleanup_failed",
+  "staging_filesystem_mismatch"
+]

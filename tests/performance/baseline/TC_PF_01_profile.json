@@ -1,0 +1,32 @@
+{
+  "concurrency": 200,
+  "edge_in_path": false,
+  "gateway_max_inflight": 256,
+  "load_levels": [
+    {
+      "concurrency": 8,
+      "label": "low"
+    },
+    {
+      "concurrency": 32,
+      "label": "moderate"
+    },
+    {
+      "concurrency": 96,
+      "label": "high"
+    },
+    {
+      "concurrency": 200,
+      "label": "baseline"
+    }
+  ],
+  "name": "gateway-stage-baseline-v2-direct-control",
+  "process_topology": {
+    "client": "8 processes; one event loop per process; one keep-alive connection per concurrent slot and path",
+    "gateway": "dedicated process",
+    "stub_runtime": "8 SO_REUSEPORT worker processes on one endpoint"
+  },
+  "request_mix": "100% streaming chat completions, one output token",
+  "stub_fixture": "FX-RT-03",
+  "warmup_requests": 200
+}

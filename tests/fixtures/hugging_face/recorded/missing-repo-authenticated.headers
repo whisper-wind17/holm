@@ -1,0 +1,23 @@
+HTTP/2 404 
+content-type: application/json; charset=utf-8
+content-length: 32
+date: Thu, 03 Sep 2026 06:40:16 GMT
+etag: W/"20-bITJowpdmeRi6flSV9yCp5Fkq5k"
+x-powered-by: huggingface-moon
+x-request-id: Root=1-6a991650-2c4ab566779a15a823c1a394
+ratelimit: "api";r=998;t=170
+ratelimit-policy: "fixed window";"api";q=1000;w=300
+cross-origin-opener-policy: same-origin
+referrer-policy: strict-origin-when-cross-origin
+access-control-max-age: 86400
+access-control-allow-origin: https://huggingface.co
+vary: Origin
+access-control-expose-headers: X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash
+x-error-code: RepoNotFound
+x-error-message: Repository not found
+x-cache: Error from cloudfront
+via: 1.1 f6ba0cbfdfc7f9e035cd4025b24bb098.cloudfront.net (CloudFront)
+x-amz-cf-pop: LAX53-P4
+alt-svc: h3=":443"; ma=86400
+x-amz-cf-id: IcblTAgEtZkKrCSXFItoqncRseiKi7AID2EwlZWKyR6Aw6bVUN7_YQ==
+strict-transport-security: max-age=31536000

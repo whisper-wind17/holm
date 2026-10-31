@@ -1,0 +1,249 @@
+{
+  "$defs": {
+    "IdentifiedValue_int_": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "const": "identified",
+          "default": "identified",
+          "title": "State",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "IdentifiedValue[int]",
+      "type": "object"
+    },
+    "IdentifiedValue_str_": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "const": "identified",
+          "default": "identified",
+          "title": "State",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "IdentifiedValue[str]",
+      "type": "object"
+    },
+    "IdentifiedValue_tuple_str__________": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "const": "identified",
+          "default": "identified",
+          "title": "State",
+          "type": "string"
+        },
+        "value": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Value",
+          "type": "array"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "IdentifiedValue[tuple[str, ...]]",
+      "type": "object"
+    },
+    "LocalAvailability": {
+      "description": "Whether the same version exists locally, as three distinguishable answers.\n\n``ABSENT`` is a conclusion the platform reached, not an omitted field: the\nwizard must be able to tell \"no local copy\" from \"nobody looked\".",
+      "enum": [
+        "artifact_ready",
+        "download_active",
+        "absent"
+      ],
+      "title": "LocalAvailability",
+      "type": "string"
+    },
+    "ModelCatalogItemResponse": {
+      "additionalProperties": false,
+      "description": "Path- and credential-free projection required by the Model catalog.",
+      "properties": {
+        "architecture": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IdentifiedValue_str_"
+            },
+            {
+              "$ref": "#/$defs/UnrecognizedValue"
+            }
+          ],
+          "title": "Architecture"
+        },
+        "display_name": {
+          "title": "Display Name",
+          "type": "string"
+        },
+        "estimated_size_bytes": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IdentifiedValue_int_"
+            },
+            {
+              "$ref": "#/$defs/UnrecognizedValue"
+            }
+          ],
+          "title": "Estimated Size Bytes"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "local_availability": {
+          "$ref": "#/$defs/LocalAvailability"
+        },
+        "modalities": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IdentifiedValue_tuple_str__________"
+            },
+            {
+              "$ref": "#/$defs/UnrecognizedValue"
+            }
+          ],
+          "title": "Modalities"
+        },
+        "references": {
+          "$ref": "#/$defs/ModelReferenceCountsResponse"
+        },
+        "repository_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Repository Id"
+        },
+        "revision": {
+          "title": "Revision",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/ModelOriginType"
+        }
+      },
+      "required": [
+        "id",
+        "source",
+        "display_name",
+        "repository_id",
+        "architecture",
+        "modalities",
+        "estimated_size_bytes",
+        "revision",
+        "local_availability",
+        "references"
+      ],
+      "title": "ModelCatalogItemResponse",
+      "type": "object"
+    },
+    "ModelOriginType": {
+      "description": "Complete Model source vocabulary.",
+      "enum": [
+        "Hugging Face",
+        "ModelScope",
+        "Local Path"
+      ],
+      "title": "ModelOriginType",
+      "type": "string"
+    },
+    "ModelReferenceCountsResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "artifacts": {
+          "minimum": 0,
+          "title": "Artifacts",
+          "type": "integer"
+        },
+        "download_tasks": {
+          "minimum": 0,
+          "title": "Download Tasks",
+          "type": "integer"
+        },
+        "model_instances": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Model Instances"
+        }
+      },
+      "required": [
+        "artifacts",
+        "download_tasks",
+        "model_instances"
+      ],
+      "title": "ModelReferenceCountsResponse",
+      "type": "object"
+    },
+    "UnrecognizedValue": {
+      "additionalProperties": false,
+      "description": "A metadata field explicitly reported as \"\u672a\u8bc6\u522b\".\n\nIt has no ``value`` key at all, so the rendering cannot degrade into\n``null``, ``\"\"``, ``0``, ``false`` or a source default.",
+      "properties": {
+        "state": {
+          "const": "unrecognized",
+          "default": "unrecognized",
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "title": "UnrecognizedValue",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "items": {
+      "items": {
+        "$ref": "#/$defs/ModelCatalogItemResponse"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "next_cursor": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Next Cursor"
+    }
+  },
+  "required": [
+    "items"
+  ],
+  "title": "CursorPage[ModelCatalogItemResponse]",
+  "type": "object"
+}

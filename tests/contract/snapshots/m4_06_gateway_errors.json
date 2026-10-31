@@ -1,0 +1,186 @@
+{
+  "api_key_expired": {
+    "status": 401,
+    "media_type": "application/json",
+    "headers": {
+      "Cache-Control": "no-store"
+    },
+    "body": {
+      "error": {
+        "code": "api_key_expired",
+        "message": "API 密钥已过期，本次调用未执行，请创建新密钥后重试",
+        "details": {},
+        "request_id": "00000000-0000-7000-8000-000000004620"
+      }
+    }
+  },
+  "backend_unavailable": {
+    "status": 503,
+    "media_type": "application/json",
+    "headers": {
+      "Cache-Control": "no-store"
+    },
+    "body": {
+      "error": {
+        "code": "backend_unavailable",
+        "message": "AI 服务暂不可用，本次调用未完成，请稍后重试",
+        "details": {},
+        "request_id": "00000000-0000-7000-8000-000000004620"
+      }
+    }
+  },
+  "control_plane_unavailable": {
+    "status": 503,
+    "media_type": "application/json",
+    "headers": {
+      "Cache-Control": "no-store"
+    },
+    "body": {
+      "error": {
+        "code": "control_plane_unavailable",
+        "message": "服务路由信息已失效，本次调用未执行，请稍后重试",
+        "details": {},
+        "request_id": "00000000-0000-7000-8000-000000004620"
+      }
+    }
+  },
+  "gateway_overloaded": {
+    "status": 503,
+    "media_type": "application/json",
+    "headers": {
+      "Cache-Control": "no-store"
+    },
+    "body": {
+      "error": {
+        "code": "gateway_overloaded",
+        "message": "平台当前请求过多，本次调用未执行，请稍后重试",
+        "details": {},
+        "request_id": "00000000-0000-7000-8000-000000004620"
+      }
+    }
+  },
+  "inference_timeout": {
+    "status": 504,
+    "media_type": "application/json",
+    "headers": {
+      "Cache-Control": "no-store"
+    },
+    "body": {
+      "error": {
+        "code": "inference_timeout",
+        "message": "AI 服务响应超时，本次调用未完成，请稍后重试",
+        "details": {},
+        "request_id": "00000000-0000-7000-8000-000000004620"
+      }
+    }
+  },
+  "invalid_api_key": {
+    "status": 401,
+    "media_type": "application/json",
+    "headers": {
+      "Cache-Control": "no-store"
+    },
+    "body": {
+      "error": {
+        "code": "invalid_api_key",
+        "message": "API 密钥无效，本次调用未执行，请检查密钥后重试",
+        "details": {},
+        "request_id": "00000000-0000-7000-8000-000000004620"
+      }
+    }
+  },
+  "invalid_request": {
+    "status": 400,
+    "media_type": "application/json",
+    "headers": {
+      "Cache-Control": "no-store"
+    },
+    "body": {
+      "error": {
+        "code": "invalid_request",
+        "message": "请求格式无效，本次调用未执行，请检查参数后重试",
+        "details": {},
+        "request_id": "00000000-0000-7000-8000-000000004620"
+      }
+    }
+  },
+  "model_not_found": {
+    "status": 404,
+    "media_type": "application/json",
+    "headers": {
+      "Cache-Control": "no-store"
+    },
+    "body": {
+      "error": {
+        "code": "model_not_found",
+        "message": "请求的模型不存在，本次调用未执行，请检查 API 模型名",
+        "details": {},
+        "request_id": "00000000-0000-7000-8000-000000004620"
+      }
+    }
+  },
+  "rate_limit_exceeded": {
+    "status": 429,
+    "media_type": "application/json",
+    "headers": {
+      "Cache-Control": "no-store",
+      "Retry-After": "1"
+    },
+    "body": {
+      "error": {
+        "code": "rate_limit_exceeded",
+        "message": "已达到该服务的每分钟请求上限（60 次），请稍后重试",
+        "details": {
+          "limit_type": "per_minute",
+          "limit": 60
+        },
+        "request_id": "00000000-0000-7000-8000-000000004620"
+      }
+    }
+  },
+  "service_disabled": {
+    "status": 503,
+    "media_type": "application/json",
+    "headers": {
+      "Cache-Control": "no-store"
+    },
+    "body": {
+      "error": {
+        "code": "service_disabled",
+        "message": "AI 服务已停用，本次调用未执行，请联系管理员启用服务",
+        "details": {},
+        "request_id": "00000000-0000-7000-8000-000000004620"
+      }
+    }
+  },
+  "service_not_authorized": {
+    "status": 403,
+    "media_type": "application/json",
+    "headers": {
+      "Cache-Control": "no-store"
+    },
+    "body": {
+      "error": {
+        "code": "service_not_authorized",
+        "message": "API 密钥无权调用该 AI 服务，本次调用未执行，请检查密钥范围",
+        "details": {},
+        "request_id": "00000000-0000-7000-8000-000000004620"
+      }
+    }
+  },
+  "usage_storage_unavailable": {
+    "status": 503,
+    "media_type": "application/json",
+    "headers": {
+      "Cache-Control": "no-store"
+    },
+    "body": {
+      "error": {
+        "code": "usage_storage_unavailable",
+        "message": "调用记录暂时无法可靠保存，本次调用未执行，请稍后重试",
+        "details": {},
+        "request_id": "00000000-0000-7000-8000-000000004620"
+      }
+    }
+  }
+}

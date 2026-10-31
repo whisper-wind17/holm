@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "reasoning_models": {
+    "Qwen3_5ForCausalLM": {
+      "efforts": ["xhigh", "medium", "low"],
+      "aliases": {"high": "xhigh", "max": "xhigh", "minimal": "low"},
+      "can_disable": true
+    },
+    "Qwen3_5MoeForCausalLM": {
+      "efforts": ["xhigh", "medium", "low"],
+      "aliases": {"high": "xhigh", "max": "xhigh", "minimal": "low"},
+      "can_disable": true
+    },
+    "Qwen3_5ForConditionalGeneration": {
+      "efforts": ["xhigh", "medium", "low"],
+      "aliases": {"high": "xhigh", "max": "xhigh", "minimal": "low"},
+      "can_disable": true
+    },
+    "Qwen3_5MoeForConditionalGeneration": {
+      "efforts": ["xhigh", "medium", "low"],
+      "aliases": {"high": "xhigh", "max": "xhigh", "minimal": "low"},
+      "can_disable": true
+    },
+    "GptOssForCausalLM": {
+      "efforts": ["low", "medium", "high"],
+      "aliases": {"minimal": "low", "xhigh": "high", "max": "high"},
+      "can_disable": false
+    }
+  },
+  "runtimes": [
+    {
+      "name": "vllm",
+      "version": "0.29.0",
+      "launcher": "process",
+      "minimum_driver_version": "580.65.06",
+      "executable": "/opt/holm-runtimes/vllm/bin/vllm",
+      "supported_architectures": ["Qwen2ForCausalLM"],
+      "reasoning_parsers": {
+        "Qwen3_5ForCausalLM": "qwen3",
+        "Qwen3_5MoeForCausalLM": "qwen3",
+        "Qwen3_5ForConditionalGeneration": "qwen3",
+        "Qwen3_5MoeForConditionalGeneration": "qwen3",
+        "GptOssForCausalLM": "openai_gptoss"
+      },
+      "tool_call_parsers": {
+        "Qwen3_5ForCausalLM": "qwen3_coder",
+        "Qwen3_5MoeForCausalLM": "qwen3_coder",
+        "Qwen3_5ForConditionalGeneration": "qwen3_coder",
+        "Qwen3_5MoeForConditionalGeneration": "qwen3_coder",
+        "GptOssForCausalLM": "openai"
+      },
+      "request_capabilities": {
+        "openai_chat_completions": [
+          "tool_choice",
+          "parallel_tool_calls",
+          "max_completion_tokens",
+          "presence_penalty",
+          "frequency_penalty",
+          "response_format",
+          "user",
+          "max_tokens",
+          "messages",
+          "model",
+          "n",
+          "reasoning_effort",
+          "seed",
+          "stop",
+          "stream",
+          "stream_options",
+          "temperature",
+          "top_p",
+          "tools"
+        ]
+      },
+      "gpu_memory_utilization": {"minimum": 0.1, "maximum": 0.95},
+      "gpu_policy": {
+        "certified_gpu_counts": [1, 2, 3, 4, 5, 6, 7, 8],
+        "max_gpus_per_instance": "auto",
+        "require_homogeneous_devices": true,
+        "p2p_topology": "preferred"
+      },
+      "tp_policy": {
+        "size_source": "selected_gpu_count",
+        "model_partition_check": "runtime_adapter"
+      },
+      "context_policy": {
+        "allowed_steps": [2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144],
+        "default": 4096
+      },
+      "failure_signatures": {
+        "out_of_memory": ["CUDA out of memory", "torch.OutOfMemoryError", "KV cache is needed, which is larger than the available KV cache memory"]
+      },
+      "metrics": {
+        "runtime_ttft_seconds": {"source": "vllm:time_to_first_token_seconds", "type": "histogram"},
+        "runtime_tpot_seconds": {"source": "vllm:request_time_per_output_token_seconds", "type": "histogram"},
+        "runtime_e2e_latency_seconds": {"source": "vllm:e2e_request_latency_seconds", "type": "histogram"},
+        "runtime_output_tokens_total": {"source": "vllm:generation_tokens_total", "type": "counter"},
+        "runtime_requests_total": {"source": "vllm:request_success_total", "type": "counter", "labels": {"finished_reason": ["stop", "length"]}},
+        "runtime_requests_running": {"source": "vllm:num_requests_running", "type": "gauge"},
+        "runtime_requests_waiting": {"source": "vllm:num_requests_waiting", "type": "gauge"},
+        "runtime_queue_time_seconds": {"source": "vllm:request_queue_time_seconds", "type": "histogram"},
+        "runtime_kv_cache_usage_ratio": {"source": "vllm:kv_cache_usage_perc", "type": "gauge"},
+        "runtime_errors_total": {"source": "vllm:request_success_total", "type": "counter", "labels": {"finished_reason": ["abort"]}}
+      },
+      "arguments": {
+        "tool_call_parser": "--tool-call-parser",
+        "enable_auto_tool_choice": "--enable-auto-tool-choice",
+        "reasoning_parser": "--reasoning-parser",
+        "serve": "serve",
+        "host": "--host",
+        "port": "--port",
+        "tensor_parallel_size": "--tensor-parallel-size",
+        "max_model_len": "--max-model-len",
+        "gpu_memory_utilization": "--gpu-memory-utilization",
+        "served_model_name": "--served-model-name",
+        "disable_request_logging": "--no-enable-log-requests",
+        "enable_metrics": null
+      }
+    },
+    {
+      "name": "sglang",
+      "version": "0.5.13",
+      "launcher": "process",
+      "minimum_driver_version": "580.65.06",
+      "executable": "/opt/holm-runtimes/sglang/bin/sglang",
+      "supported_architectures": ["Qwen2ForCausalLM"],
+      "reasoning_parsers": {
+        "Qwen3_5ForCausalLM": "qwen3",
+        "Qwen3_5MoeForCausalLM": "qwen3",
+        "Qwen3_5ForConditionalGeneration": "qwen3",
+        "Qwen3_5MoeForConditionalGeneration": "qwen3",
+        "GptOssForCausalLM": "gpt-oss"
+      },
+      "tool_call_parsers": {
+        "Qwen3_5ForCausalLM": "qwen3_coder",
+        "Qwen3_5MoeForCausalLM": "qwen3_coder",
+        "Qwen3_5ForConditionalGeneration": "qwen3_coder",
+        "Qwen3_5MoeForConditionalGeneration": "qwen3_coder",
+        "GptOssForCausalLM": "gpt-oss"
+      },
+      "request_capabilities": {
+        "openai_chat_completions": [
+          "tool_choice",
+          "parallel_tool_calls",
+          "max_completion_tokens",
+          "presence_penalty",
+          "frequency_penalty",
+          "response_format",
+          "user",
+          "max_tokens",
+          "messages",
+          "model",
+          "n",
+          "reasoning_effort",
+          "seed",
+          "stop",
+          "stream",
+          "stream_options",
+          "temperature",
+          "top_p",
+          "tools"
+        ]
+      },
+      "gpu_memory_utilization": {"minimum": 0.1, "maximum": 0.95},
+      "gpu_policy": {
+        "certified_gpu_counts": [1, 2, 4],
+        "max_gpus_per_instance": "auto",
+        "require_homogeneous_devices": true,
+        "p2p_topology": "preferred"
+      },
+      "tp_policy": {
+        "size_source": "selected_gpu_count",
+        "model_partition_check": "runtime_adapter"
+      },
+      "context_policy": {
+        "allowed_steps": [2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144],
+        "default": 4096
+      },
+      "failure_signatures": {
+        "out_of_memory": ["CUDA out of memory", "torch.OutOfMemoryError", "KV cache is needed, which is larger than the available KV cache memory", "Not enough memory. Please try to increase --mem-fraction-static."]
+      },
+      "metrics": {
+        "runtime_ttft_seconds": {"source": "sglang:time_to_first_token_seconds", "type": "histogram"},
+        "runtime_tpot_seconds": null,
+        "runtime_e2e_latency_seconds": {"source": "sglang:e2e_request_latency_seconds", "type": "histogram"},
+        "runtime_output_tokens_total": {"source": "sglang:generation_tokens_total", "type": "counter"},
+        "runtime_requests_total": {"source": "sglang:num_requests_total", "type": "counter"},
+        "runtime_requests_running": {"source": "sglang:num_running_reqs", "type": "gauge"},
+        "runtime_requests_waiting": {"source": "sglang:num_queue_reqs", "type": "gauge"},
+        "runtime_queue_time_seconds": {"source": "sglang:queue_time_seconds", "type": "histogram"},
+        "runtime_kv_cache_usage_ratio": {"source": "sglang:token_usage", "type": "gauge"},
+        "runtime_errors_total": null
+      },
+      "arguments": {
+        "tool_call_parser": "--tool-call-parser",
+        "enable_auto_tool_choice": null,
+        "reasoning_parser": "--reasoning-parser",
+        "serve": "serve",
+        "model_path": "--model-path",
+        "host": "--host",
+        "port": "--port",
+        "tensor_parallel_size": "--tp-size",
+        "max_model_len": "--context-length",
+        "gpu_memory_utilization": "--mem-fraction-static",
+        "served_model_name": "--served-model-name",
+        "disable_request_logging": null,
+        "enable_metrics": "--enable-metrics"
+      }
+    }
+  ]
+}

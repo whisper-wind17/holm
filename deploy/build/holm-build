@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+"""Build Holm locally using Docker and the Python 3.12 standard library."""
+
+import sys
+
+# Check before importing modules that require Python 3.12's standard library.
+if sys.version_info[:2] != (3, 12):
+    print(
+        "step=preflight result=failed remedy=Python 3.12 required; select python3.12",
+        file=sys.stderr,
+    )
+    raise SystemExit(1)
+
+from local_build import main  # noqa: E402
+
+raise SystemExit(main())

@@ -1,0 +1,104 @@
+# Holm Edge.
+#
+# The installer renders this template; every {{UPPER_CASE}} placeholder is
+# replaced before Caddy loads the file. Caddy's own {placeholders} stay as is.
+#
+#   {{SITE_ADDRESS}}      Public host name or IP, for example ws.example.com
+#   {{TLS_DIRECTIVE}}     Exactly one of the three TLS modes:
+#                           acme         tls {{ACME_EMAIL}}
+#                           provided     tls {{TLS_CERT_FILE}} {{TLS_KEY_FILE}}
+#                           internal-ca  tls internal
+#   {{CONTROL_UPSTREAM}}  Control API address on the internal network
+#   {{GATEWAY_UPSTREAM}}  Gateway address on the internal network
+#   {{WEB_ROOT}}          Built SPA directory (index.html plus hashed /assets)
+#   {{LOG_DIR}}           Edge access log directory
+#
+# Port 80 only redirects to 443: Caddy's automatic HTTPS does that for the site
+# address, and nothing else listens on 80.
+#
+
+{{SITE_ADDRESS}} {
+	{{TLS_DIRECTIVE}}
+
+	# Request body limit: 16 MiB. Caddy reads MB as 10^6, so spell MiB.
+	request_body {
+		max_size 16MiB
+	}
+
+	# Access log: method, status, duration and size only. Caddy never logs
+	# bodies; request and response headers (Authorization, Cookie, Set-Cookie)
+	# and the URI (query secrets) are removed before the entry is written.
+	log {
+		output file {{LOG_DIR}}/edge-access.log
+		format filter {
+			wrap json
+			fields {
+				request>headers delete
+				request>uri delete
+				request>tls delete
+				resp_headers delete
+			}
+		}
+	}
+
+	# /api and /api/* (including /api/v1/events SSE) go to the Control API.
+	# No encode directive in this block: SSE must not be compressed, and
+	# flush_interval -1 writes every upstream chunk immediately. Errors and 404s
+	# are the upstream's own JSON; the SPA fallback never sees these paths.
+	@control path /api /api/*
+	handle @control {
+		header ?Cache-Control "no-store"
+		reverse_proxy {{CONTROL_UPSTREAM}} {
+			flush_interval -1
+		}
+	}
+
+	# /v1 and /v1/* go to the Gateway with the same streaming rules.
+	@gateway path /v1 /v1/*
+	handle @gateway {
+		header ?Cache-Control "no-store"
+		reverse_proxy {{GATEWAY_UPSTREAM}} {
+			flush_interval -1
+		}
+	}
+
+	# Content-hashed JS/CSS/fonts are immutable. A missing asset is a plain 404,
+	# never index.html, so a stale page cannot execute HTML as a script.
+	handle /assets/* {
+		root * {{WEB_ROOT}}
+		@hashed file
+		header @hashed Cache-Control "public, max-age=31536000, immutable"
+		encode zstd gzip
+		file_server
+	}
+
+	# Everything else: SPA for GET/HEAD only. index.html and unhashed files are
+	# no-store so a new release is picked up on the next load.
+	@spa_method method GET HEAD
+	handle @spa_method {
+		root * {{WEB_ROOT}}
+		header Cache-Control "no-store"
+		encode zstd gzip
+		try_files {path} /index.html
+		file_server
+	}
+
+	handle {
+		respond 405
+	}
+}
+
+# Control API probes this container-only listener; Compose does not publish it.
+http://:8081 {
+	@live {
+		method GET
+		path /internal/health/live
+	}
+	handle @live {
+		header Content-Type application/json
+		respond `{"status":"live"}` 200
+	}
+	handle {
+		respond 404
+	}
+}

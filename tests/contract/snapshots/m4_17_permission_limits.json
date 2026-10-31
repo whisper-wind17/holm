@@ -1,0 +1,191 @@
+{
+  "GrantedServiceResponse": {
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "format": "uuid",
+        "title": "Id",
+        "type": "string"
+      },
+      "name": {
+        "title": "Name",
+        "type": "string"
+      },
+      "public_model_name": {
+        "title": "Public Model Name",
+        "type": "string"
+      },
+      "description": {
+        "title": "Description",
+        "type": "string"
+      },
+      "enabled": {
+        "title": "Enabled",
+        "type": "boolean"
+      },
+      "max_concurrent_requests": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Max Concurrent Requests"
+      },
+      "max_requests_per_minute": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Max Requests Per Minute"
+      }
+    },
+    "required": [
+      "id",
+      "name",
+      "public_model_name",
+      "description",
+      "enabled"
+    ],
+    "title": "GrantedServiceResponse",
+    "type": "object"
+  },
+  "ReplaceServicePermissionsRequest": {
+    "$defs": {
+      "PermissionLimits": {
+        "additionalProperties": false,
+        "properties": {
+          "max_concurrent_requests": {
+            "anyOf": [
+              {
+                "maximum": 64,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Max Concurrent Requests"
+          },
+          "max_requests_per_minute": {
+            "anyOf": [
+              {
+                "maximum": 600,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Max Requests Per Minute"
+          }
+        },
+        "title": "PermissionLimits",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "user_ids": {
+        "items": {
+          "format": "uuid",
+          "type": "string"
+        },
+        "title": "User Ids",
+        "type": "array"
+      },
+      "limits": {
+        "additionalProperties": {
+          "$ref": "#/$defs/PermissionLimits"
+        },
+        "propertyNames": {
+          "format": "uuid"
+        },
+        "title": "Limits",
+        "type": "object"
+      }
+    },
+    "required": [
+      "user_ids"
+    ],
+    "title": "ReplaceServicePermissionsRequest",
+    "type": "object"
+  },
+  "ReplaceUserPermissionsRequest": {
+    "$defs": {
+      "PermissionLimits": {
+        "additionalProperties": false,
+        "properties": {
+          "max_concurrent_requests": {
+            "anyOf": [
+              {
+                "maximum": 64,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Max Concurrent Requests"
+          },
+          "max_requests_per_minute": {
+            "anyOf": [
+              {
+                "maximum": 600,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Max Requests Per Minute"
+          }
+        },
+        "title": "PermissionLimits",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "service_ids": {
+        "items": {
+          "format": "uuid",
+          "type": "string"
+        },
+        "title": "Service Ids",
+        "type": "array"
+      },
+      "limits": {
+        "additionalProperties": {
+          "$ref": "#/$defs/PermissionLimits"
+        },
+        "propertyNames": {
+          "format": "uuid"
+        },
+        "title": "Limits",
+        "type": "object"
+      }
+    },
+    "required": [
+      "service_ids"
+    ],
+    "title": "ReplaceUserPermissionsRequest",
+    "type": "object"
+  }
+}

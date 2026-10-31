@@ -1,0 +1,170 @@
+{
+  "fixture_id": "FX-MS-FIX-23-LAYOUT",
+  "source": "录制自测试环境 POST /api/v1/models/resolve（ModelScope，@default→master）；只保留路径与大小",
+  "repositories": {
+    "Qwen/Qwen-Image-2.1": [
+      {
+        "path": ".gitattributes",
+        "size_bytes": 2312
+      },
+      {
+        "path": "LICENSE",
+        "size_bytes": 7831
+      },
+      {
+        "path": "README.md",
+        "size_bytes": 5399
+      },
+      {
+        "path": "assets/qr.png",
+        "size_bytes": 3172431
+      },
+      {
+        "path": "configuration.json",
+        "size_bytes": 34
+      },
+      {
+        "path": "model_index.json",
+        "size_bytes": 447
+      },
+      {
+        "path": "processor/added_tokens.json",
+        "size_bytes": 707
+      },
+      {
+        "path": "processor/chat_template.jinja",
+        "size_bytes": 5292
+      },
+      {
+        "path": "processor/merges.txt",
+        "size_bytes": 1671853
+      },
+      {
+        "path": "processor/preprocessor_config.json",
+        "size_bytes": 782
+      },
+      {
+        "path": "processor/special_tokens_map.json",
+        "size_bytes": 613
+      },
+      {
+        "path": "processor/tokenizer.json",
+        "size_bytes": 11422654
+      },
+      {
+        "path": "processor/tokenizer_config.json",
+        "size_bytes": 5445
+      },
+      {
+        "path": "processor/video_preprocessor_config.json",
+        "size_bytes": 817
+      },
+      {
+        "path": "processor/vocab.json",
+        "size_bytes": 2776833
+      },
+      {
+        "path": "scheduler/scheduler_config.json",
+        "size_bytes": 485
+      },
+      {
+        "path": "text_encoder/config.json",
+        "size_bytes": 1517
+      },
+      {
+        "path": "text_encoder/generation_config.json",
+        "size_bytes": 213
+      },
+      {
+        "path": "text_encoder/model-00001-of-00004.safetensors",
+        "size_bytes": 4998056552
+      },
+      {
+        "path": "text_encoder/model-00002-of-00004.safetensors",
+        "size_bytes": 4915962464
+      },
+      {
+        "path": "text_encoder/model-00003-of-00004.safetensors",
+        "size_bytes": 4915962496
+      },
+      {
+        "path": "text_encoder/model-00004-of-00004.safetensors",
+        "size_bytes": 2704357976
+      },
+      {
+        "path": "text_encoder/model.safetensors.index.json",
+        "size_bytes": 67795
+      },
+      {
+        "path": "transformer/config.json",
+        "size_bytes": 370
+      },
+      {
+        "path": "transformer/diffusion_pytorch_model-00001-of-00002.safetensors",
+        "size_bytes": 9968332504
+      },
+      {
+        "path": "transformer/diffusion_pytorch_model-00002-of-00002.safetensors",
+        "size_bytes": 4261951904
+      },
+      {
+        "path": "transformer/diffusion_pytorch_model.safetensors.index.json",
+        "size_bytes": 30283
+      },
+      {
+        "path": "vae/config.json",
+        "size_bytes": 2079
+      },
+      {
+        "path": "vae/diffusion_pytorch_model.safetensors",
+        "size_bytes": 1350989512
+      }
+    ],
+    "Qwen/Qwen2.5-0.5B-Instruct": [
+      {
+        "path": ".gitattributes",
+        "size_bytes": 1519
+      },
+      {
+        "path": "LICENSE",
+        "size_bytes": 11343
+      },
+      {
+        "path": "README.md",
+        "size_bytes": 4917
+      },
+      {
+        "path": "config.json",
+        "size_bytes": 659
+      },
+      {
+        "path": "configuration.json",
+        "size_bytes": 2
+      },
+      {
+        "path": "generation_config.json",
+        "size_bytes": 242
+      },
+      {
+        "path": "merges.txt",
+        "size_bytes": 1671839
+      },
+      {
+        "path": "model.safetensors",
+        "size_bytes": 988097824
+      },
+      {
+        "path": "tokenizer.json",
+        "size_bytes": 7031645
+      },
+      {
+        "path": "tokenizer_config.json",
+        "size_bytes": 7305
+      },
+      {
+        "path": "vocab.json",
+        "size_bytes": 2776833
+      }
+    ]
+  }
+}

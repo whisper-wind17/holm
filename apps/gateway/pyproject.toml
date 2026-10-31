@@ -1,0 +1,36 @@
+[project]
+name = "holm-gateway"
+version = "0.1.0rc1"
+description = "Private AI Workspace OpenAI-compatible Gateway"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "fastapi==0.141.1",
+  "httpx==0.28.1",
+  "holm-common==0.1.0rc1",
+  "holm-contracts==0.1.0rc1",
+  "holm-domain==0.1.0rc1",
+  "holm-ledger==0.1.0rc1",
+  "holm-persistence==0.1.0rc1",
+  "holm-protocols==0.1.0rc1",
+  "holm-runtimes==0.1.0rc1",
+  "holm-security==0.1.0rc1",
+  "sqlalchemy==2.0.52",
+  "uvicorn==0.52.4",
+]
+
+[project.scripts]
+holm-gateway = "holm_gateway.__main__:main"
+
+[tool.uv.sources]
+holm-common = { workspace = true }
+holm-contracts = { workspace = true }
+holm-domain = { workspace = true }
+holm-ledger = { workspace = true }
+holm-persistence = { workspace = true }
+holm-protocols = { workspace = true }
+holm-runtimes = { workspace = true }
+holm-security = { workspace = true }
+
+[build-system]
+requires = ["uv_build==0.11.7"]
+build-backend = "uv_build"

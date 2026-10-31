@@ -1,0 +1,13 @@
+{
+  "name": "holm",
+  "version": "0.1.0-rc.1",
+  "private": true,
+  "packageManager": "npm@11.9.0",
+  "engines": {
+    "node": "^22.13.0 || >=24 <25",
+    "npm": ">=10 <12"
+  },
+  "workspaces": [
+    "apps/web"
+  ]
+}

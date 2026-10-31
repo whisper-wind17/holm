@@ -1,0 +1,26 @@
+[Unit]
+Description=Private AI Workspace Host Agent
+After=local-fs.target
+
+[Service]
+Type=simple
+User=holm-agent
+Group=holm-agent
+ExecStart=/opt/holm/venv/bin/holm-host-agent
+Restart=on-failure
+RestartSec=2s
+RuntimeDirectory=holm
+RuntimeDirectoryMode=0750
+RuntimeDirectoryPreserve=yes
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/run/holm
+RestrictAddressFamilies=AF_UNIX
+LimitNOFILE=65536
+TasksMax=256
+UMask=0007
+
+[Install]
+WantedBy=multi-user.target

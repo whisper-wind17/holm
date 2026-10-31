@@ -1,0 +1,24 @@
+[project]
+name = "holm-persistence"
+version = "0.1.0rc1"
+description = "PostgreSQL persistence adapters for Private AI Workspace"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "alembic==1.19.1",
+  "holm-common==0.1.0rc1",
+  "holm-domain==0.1.0rc1",
+  "holm-ledger==0.1.0rc1",
+  "holm-security==0.1.0rc1",
+  "psycopg==3.3.4",
+  "sqlalchemy==2.0.52",
+]
+
+[tool.uv.sources]
+holm-common = { workspace = true }
+holm-domain = { workspace = true }
+holm-ledger = { workspace = true }
+holm-security = { workspace = true }
+
+[build-system]
+requires = ["uv_build==0.11.7"]
+build-backend = "uv_build"

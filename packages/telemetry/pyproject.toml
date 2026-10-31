@@ -1,0 +1,20 @@
+[project]
+name = "holm-telemetry"
+version = "0.1.0rc1"
+description = "Bounded telemetry collection and in-memory query state"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "holm-contracts==0.1.0rc1",
+  "holm-domain==0.1.0rc1",
+  "holm-persistence==0.1.0rc1",
+  "sqlalchemy==2.0.52",
+]
+
+[tool.uv.sources]
+holm-contracts = { workspace = true }
+holm-domain = { workspace = true }
+holm-persistence = { workspace = true }
+
+[build-system]
+requires = ["uv_build==0.11.7"]
+build-backend = "uv_build"

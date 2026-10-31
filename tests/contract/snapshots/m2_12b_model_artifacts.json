@@ -1,0 +1,206 @@
+{
+  "$defs": {
+    "ArtifactStorageType": {
+      "description": "Whether Artifact files are managed by the platform or externally owned.",
+      "enum": [
+        "Managed",
+        "External"
+      ],
+      "title": "ArtifactStorageType",
+      "type": "string"
+    },
+    "ModelArtifactItemResponse": {
+      "additionalProperties": false,
+      "description": "One local Model row.\n\n``referencing_instances`` is always ``null`` today and must not become\n``0``: the platform does not report the count here, rather than knowing\nit to be zero.\n\n``last_verified_at`` is the latest completed manual or launch verification time,\nincluding a completed unhealthy judgement. Before any verification completes it\nremains the publication time; enqueueing and execution failures never advance it.",
+      "properties": {
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "display_name": {
+          "title": "Display Name",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "last_verified_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Last Verified At"
+        },
+        "model_id": {
+          "format": "uuid",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "referencing_instances": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Referencing Instances"
+        },
+        "repository_id": {
+          "title": "Repository Id",
+          "type": "string"
+        },
+        "resolved_revision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Resolved Revision"
+        },
+        "size_bytes": {
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        },
+        "source": {
+          "$ref": "#/$defs/ModelOriginType"
+        },
+        "status": {
+          "$ref": "#/$defs/ModelArtifactStatus"
+        },
+        "storage_type": {
+          "$ref": "#/$defs/ArtifactStorageType"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "model_id",
+        "display_name",
+        "source",
+        "repository_id",
+        "resolved_revision",
+        "status",
+        "storage_type",
+        "size_bytes",
+        "path",
+        "referencing_instances",
+        "last_verified_at",
+        "created_at",
+        "updated_at"
+      ],
+      "title": "ModelArtifactItemResponse",
+      "type": "object"
+    },
+    "ModelArtifactStatus": {
+      "description": "Model Artifact lifecycle states.",
+      "enum": [
+        "Ready",
+        "Corrupted",
+        "Missing"
+      ],
+      "title": "ModelArtifactStatus",
+      "type": "string"
+    },
+    "ModelArtifactSummaryResponse": {
+      "additionalProperties": false,
+      "description": "The three storage figures above the Local models table.\n\n``managed_bytes`` counts Managed Artifacts only.  External files belong to\nthe administrator, the platform does not occupy them, and they may sit on a\ndifferent filesystem than the one ``storage_available_bytes`` measures --\nadding the two kinds together would produce a number that reconciles with\nnothing.  Each External row still reports its own ``size_bytes``.",
+      "properties": {
+        "active_download_tasks": {
+          "minimum": 0,
+          "title": "Active Download Tasks",
+          "type": "integer"
+        },
+        "managed_bytes": {
+          "minimum": 0,
+          "title": "Managed Bytes",
+          "type": "integer"
+        },
+        "storage_available_bytes": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Storage Available Bytes"
+        }
+      },
+      "required": [
+        "managed_bytes",
+        "storage_available_bytes",
+        "active_download_tasks"
+      ],
+      "title": "ModelArtifactSummaryResponse",
+      "type": "object"
+    },
+    "ModelOriginType": {
+      "description": "Complete Model source vocabulary.",
+      "enum": [
+        "Hugging Face",
+        "ModelScope",
+        "Local Path"
+      ],
+      "title": "ModelOriginType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The shared page contract plus the page-level storage summary.",
+  "properties": {
+    "items": {
+      "items": {
+        "$ref": "#/$defs/ModelArtifactItemResponse"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "next_cursor": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Next Cursor"
+    },
+    "summary": {
+      "$ref": "#/$defs/ModelArtifactSummaryResponse"
+    }
+  },
+  "required": [
+    "items",
+    "summary"
+  ],
+  "title": "ModelArtifactPageResponse",
+  "type": "object"
+}

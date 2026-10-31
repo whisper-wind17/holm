@@ -1,0 +1,214 @@
+/* ============================================================================
+   Holm — v0.1 图标 mask 规则
+   ----------------------------------------------------------------------------
+   Adobe Spectrum 2 workflow 图标集，20 px 网格。SVG 作为 currentColor 上的
+   CSS mask，图标永远继承文字色（不硬编码图标色）。
+   基础尺寸类 .pwi / .pwi-xs / .pwi-s / .pwi-l / .pwi-xl / .pwi-96 在 tokens.css。
+
+   资源自托管，不通过 CDN 引入。需把下列 48 个 SVG
+   从 Spectrum 2 图标集 vendoring 到 ../assets/icons/：
+
+   Add · AlertDiamond · AlertTriangle · ChartBarVert · Checkmark · CheckmarkCircle
+   ChevronDoubleLeft · ChevronDoubleRight · ChevronDown · ChevronLeft · ChevronRight · ChevronUp
+   Clock · Close · CloseCircle · Cloud · Copy · Data
+   Delete · Download · FileText · Filter · Folder · HelpCircle
+   Home · Import · InfoCircle · Key · Layers · Link
+   Lock · MenuHamburger · More · Pause · Play · Preview
+   Publish · Redo · Refresh · Search · Settings · SortDown
+   Target · Tools · UserAvatar · UserGroup · Visibility · VisibilityOff
+
+   缺失任一资源时该图标不可见但不报错，因此必须包含资源齐备性检查。
+   ========================================================================== */
+
+.i-home {
+  -webkit-mask-image: url(../assets/icons/Home.svg);
+  mask-image: url(../assets/icons/Home.svg);
+}
+.i-cloud {
+  -webkit-mask-image: url(../assets/icons/Cloud.svg);
+  mask-image: url(../assets/icons/Cloud.svg);
+}
+.i-layers {
+  -webkit-mask-image: url(../assets/icons/Layers.svg);
+  mask-image: url(../assets/icons/Layers.svg);
+}
+.i-users {
+  -webkit-mask-image: url(../assets/icons/UserGroup.svg);
+  mask-image: url(../assets/icons/UserGroup.svg);
+}
+.i-chart {
+  -webkit-mask-image: url(../assets/icons/ChartBarVert.svg);
+  mask-image: url(../assets/icons/ChartBarVert.svg);
+}
+.i-tools {
+  -webkit-mask-image: url(../assets/icons/Tools.svg);
+  mask-image: url(../assets/icons/Tools.svg);
+}
+.i-help {
+  -webkit-mask-image: url(../assets/icons/HelpCircle.svg);
+  mask-image: url(../assets/icons/HelpCircle.svg);
+}
+.i-cdown {
+  -webkit-mask-image: url(../assets/icons/ChevronDown.svg);
+  mask-image: url(../assets/icons/ChevronDown.svg);
+}
+.i-cright {
+  -webkit-mask-image: url(../assets/icons/ChevronRight.svg);
+  mask-image: url(../assets/icons/ChevronRight.svg);
+}
+.i-cleft {
+  -webkit-mask-image: url(../assets/icons/ChevronLeft.svg);
+  mask-image: url(../assets/icons/ChevronLeft.svg);
+}
+.i-cup {
+  -webkit-mask-image: url(../assets/icons/ChevronUp.svg);
+  mask-image: url(../assets/icons/ChevronUp.svg);
+}
+.i-collapse {
+  -webkit-mask-image: url(../assets/icons/ChevronDoubleLeft.svg);
+  mask-image: url(../assets/icons/ChevronDoubleLeft.svg);
+}
+.i-expand {
+  -webkit-mask-image: url(../assets/icons/ChevronDoubleRight.svg);
+  mask-image: url(../assets/icons/ChevronDoubleRight.svg);
+}
+.i-menu {
+  -webkit-mask-image: url(../assets/icons/MenuHamburger.svg);
+  mask-image: url(../assets/icons/MenuHamburger.svg);
+}
+.i-avatar {
+  -webkit-mask-image: url(../assets/icons/UserAvatar.svg);
+  mask-image: url(../assets/icons/UserAvatar.svg);
+}
+.i-key {
+  -webkit-mask-image: url(../assets/icons/Key.svg);
+  mask-image: url(../assets/icons/Key.svg);
+}
+.i-ok {
+  -webkit-mask-image: url(../assets/icons/CheckmarkCircle.svg);
+  mask-image: url(../assets/icons/CheckmarkCircle.svg);
+}
+.i-check {
+  -webkit-mask-image: url(../assets/icons/Checkmark.svg);
+  mask-image: url(../assets/icons/Checkmark.svg);
+}
+.i-warn {
+  -webkit-mask-image: url(../assets/icons/AlertTriangle.svg);
+  mask-image: url(../assets/icons/AlertTriangle.svg);
+}
+.i-crit {
+  -webkit-mask-image: url(../assets/icons/AlertDiamond.svg);
+  mask-image: url(../assets/icons/AlertDiamond.svg);
+}
+.i-fail {
+  -webkit-mask-image: url(../assets/icons/CloseCircle.svg);
+  mask-image: url(../assets/icons/CloseCircle.svg);
+}
+.i-info {
+  -webkit-mask-image: url(../assets/icons/InfoCircle.svg);
+  mask-image: url(../assets/icons/InfoCircle.svg);
+}
+.i-clock {
+  -webkit-mask-image: url(../assets/icons/Clock.svg);
+  mask-image: url(../assets/icons/Clock.svg);
+}
+.i-pause {
+  -webkit-mask-image: url(../assets/icons/Pause.svg);
+  mask-image: url(../assets/icons/Pause.svg);
+}
+.i-play {
+  -webkit-mask-image: url(../assets/icons/Play.svg);
+  mask-image: url(../assets/icons/Play.svg);
+}
+.i-refresh {
+  -webkit-mask-image: url(../assets/icons/Refresh.svg);
+  mask-image: url(../assets/icons/Refresh.svg);
+}
+.i-redo {
+  -webkit-mask-image: url(../assets/icons/Redo.svg);
+  mask-image: url(../assets/icons/Redo.svg);
+}
+.i-download {
+  -webkit-mask-image: url(../assets/icons/Download.svg);
+  mask-image: url(../assets/icons/Download.svg);
+}
+.i-publish {
+  -webkit-mask-image: url(../assets/icons/Publish.svg);
+  mask-image: url(../assets/icons/Publish.svg);
+}
+.i-verify {
+  -webkit-mask-image: url(../assets/icons/Preview.svg);
+  mask-image: url(../assets/icons/Preview.svg);
+}
+.i-prepare {
+  -webkit-mask-image: url(../assets/icons/Import.svg);
+  mask-image: url(../assets/icons/Import.svg);
+}
+.i-lock {
+  -webkit-mask-image: url(../assets/icons/Lock.svg);
+  mask-image: url(../assets/icons/Lock.svg);
+}
+.i-close {
+  -webkit-mask-image: url(../assets/icons/Close.svg);
+  mask-image: url(../assets/icons/Close.svg);
+}
+.i-search {
+  -webkit-mask-image: url(../assets/icons/Search.svg);
+  mask-image: url(../assets/icons/Search.svg);
+}
+.i-delete {
+  -webkit-mask-image: url(../assets/icons/Delete.svg);
+  mask-image: url(../assets/icons/Delete.svg);
+}
+.i-more {
+  -webkit-mask-image: url(../assets/icons/More.svg);
+  mask-image: url(../assets/icons/More.svg);
+}
+.i-copy {
+  -webkit-mask-image: url(../assets/icons/Copy.svg);
+  mask-image: url(../assets/icons/Copy.svg);
+}
+.i-add {
+  -webkit-mask-image: url(../assets/icons/Add.svg);
+  mask-image: url(../assets/icons/Add.svg);
+}
+.i-eye {
+  -webkit-mask-image: url(../assets/icons/Visibility.svg);
+  mask-image: url(../assets/icons/Visibility.svg);
+}
+.i-eye-off {
+  -webkit-mask-image: url(../assets/icons/VisibilityOff.svg);
+  mask-image: url(../assets/icons/VisibilityOff.svg);
+}
+.i-filter {
+  -webkit-mask-image: url(../assets/icons/Filter.svg);
+  mask-image: url(../assets/icons/Filter.svg);
+}
+.i-sort {
+  -webkit-mask-image: url(../assets/icons/SortDown.svg);
+  mask-image: url(../assets/icons/SortDown.svg);
+}
+.i-log {
+  -webkit-mask-image: url(../assets/icons/FileText.svg);
+  mask-image: url(../assets/icons/FileText.svg);
+}
+.i-gpu {
+  -webkit-mask-image: url(../assets/icons/Data.svg);
+  mask-image: url(../assets/icons/Data.svg);
+}
+.i-folder {
+  -webkit-mask-image: url(../assets/icons/Folder.svg);
+  mask-image: url(../assets/icons/Folder.svg);
+}
+.i-target {
+  -webkit-mask-image: url(../assets/icons/Target.svg);
+  mask-image: url(../assets/icons/Target.svg);
+}
+.i-settings {
+  -webkit-mask-image: url(../assets/icons/Settings.svg);
+  mask-image: url(../assets/icons/Settings.svg);
+}
+.i-link {
+  -webkit-mask-image: url(../assets/icons/Link.svg);
+  mask-image: url(../assets/icons/Link.svg);
+}

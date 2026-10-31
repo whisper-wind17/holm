@@ -1,0 +1,151 @@
+.pw-system-group {
+  min-width: 0;
+  border: var(--pw-width-hairline) solid var(--pw-border-hairline);
+  border-radius: var(--pw-radius-lg);
+  overflow: hidden;
+}
+.pw-system-group h2 {
+  margin: 0;
+  padding: var(--pw-space-16);
+  font-size: var(--pw-size-card);
+  line-height: var(--pw-lh-card);
+  border-bottom: var(--pw-width-hairline) solid var(--pw-border-hairline);
+}
+.pw-system-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pw-space-12);
+}
+.pw-system-negative {
+  color: var(--pw-negative-text);
+}
+.pw-system-sub,
+.pw-system-external {
+  display: block;
+  margin-top: var(--pw-space-4);
+  font-size: var(--pw-size-aux);
+  color: var(--pw-text-tertiary);
+}
+.pw-system-external {
+  color: var(--pw-notice-text);
+}
+.pw-system-muted {
+  color: var(--pw-text-tertiary);
+}
+.pw-system-count {
+  margin-left: var(--pw-space-8);
+  padding: 0 var(--pw-space-8);
+  border-radius: var(--pw-radius-pill);
+  color: var(--pw-negative-text);
+  background: var(--pw-negative-tint);
+}
+.pw-system-bar {
+  width: calc(var(--pw-space-80) + var(--pw-space-40));
+  max-width: 100%;
+  height: var(--pw-space-4);
+  margin-top: var(--pw-space-8);
+  border-radius: var(--pw-radius-sm);
+  background: var(--pw-surface-sunken);
+  overflow: hidden;
+}
+.pw-system-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--pw-accent-fill);
+}
+.pw-system-bar > .pw-system-bar__hot {
+  background: var(--pw-notice-fill);
+}
+/* Keep all columns in the table's own scroll region on narrow screens. */
+.pw-system-page .pw-tabs__content[data-system-panel] [data-column] {
+  display: table-cell;
+}
+.pw-system-page .pw-tabs__content {
+  min-width: 0;
+}
+.pw-system-group .pw-table {
+  min-width: calc(var(--pw-space-80) * 8);
+}
+.pw-diagnostics-fields {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--pw-space-16);
+}
+@media (max-width: 1100px) {
+  .pw-diagnostics-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 900px) {
+  .pw-system-page .pw-system-summary-grid,
+  .pw-diagnostics-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.pw-system-group > .pw-table-wrap {
+  border: 0;
+  border-radius: 0;
+}
+.pw-system-group .pw-table tbody td {
+  padding-block: var(--pw-space-12);
+}
+.pw-system-group .pw-table tr:has(.pw-system-muted) td {
+  color: var(--pw-text-tertiary);
+}
+.pw-system-gpu .pw-table {
+  min-width: calc(var(--pw-space-80) * 12);
+}
+.pw-system-gpu .pw-system-footnote {
+  margin: 0;
+  padding: var(--pw-space-12) var(--pw-space-16);
+  border-top: var(--pw-width-hairline) solid var(--pw-border-hairline);
+}
+.pw-system-section__title {
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.pw-system-group .pw-table [data-column="current"],
+.pw-system-group .pw-table [data-column="minimum"],
+.pw-system-group .pw-table [data-column="service"] {
+  white-space: nowrap;
+}
+.pw-system-group .pw-table [data-column="status"],
+.pw-system-group .pw-table [data-column="compatibility"] {
+  min-width: calc(var(--pw-space-80) * 2);
+}
+.pw-diagnostics textarea.pw-input {
+  min-height: var(--pw-space-64);
+  resize: vertical;
+  padding: var(--pw-space-8) var(--pw-space-12);
+}
+.pw-diagnostics .pw-system-group > p,
+.pw-diagnostics .pw-system-group > div:last-child {
+  margin-inline: var(--pw-space-16);
+  margin-bottom: var(--pw-space-12);
+}
+.pw-system-page [data-system-panel="components"] .pw-table th:nth-child(1),
+.pw-system-page [data-system-panel="components"] .pw-table th:nth-child(2) {
+  width: 24%;
+}
+.pw-system-page [data-system-panel="components"] .pw-table th:nth-child(3) {
+  width: 22%;
+}
+.pw-system-summary-grid > .pw-system-panel {
+  padding: 0;
+  overflow: hidden;
+}
+.pw-system-summary-grid > .pw-system-panel h2 {
+  padding: var(--pw-space-16);
+  border-bottom: var(--pw-width-hairline) solid var(--pw-border-hairline);
+}
+.pw-system-summary-grid > .pw-system-panel dl,
+.pw-system-summary-grid > .pw-system-panel p {
+  margin: var(--pw-space-16);
+}
+
+.pw-system-gpu .pw-table [data-column="temperature"],
+.pw-system-gpu .pw-table [data-column="power"] {
+  text-align: center !important;
+}

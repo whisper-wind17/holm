@@ -1,0 +1,22 @@
+{
+  "additionalProperties": false,
+  "description": "Accepted work is queued, not a completed integrity judgement.",
+  "properties": {
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "queued": {
+      "const": true,
+      "default": true,
+      "title": "Queued",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "id"
+  ],
+  "title": "ArtifactVerifyResponse",
+  "type": "object"
+}

@@ -1,0 +1,94 @@
+{
+  "format_version": 1,
+  "generated_at": "2026-09-22T09:00:00+00:00",
+  "window": {
+    "from": "2026-09-22T08:00:00+00:00",
+    "to": "2026-09-22T09:00:00+00:00"
+  },
+  "request_ids": [],
+  "instance_id": null,
+  "limits": {
+    "max_window_minutes": 1440,
+    "max_request_ids": 20,
+    "max_events": 100,
+    "max_log_lines": 500,
+    "max_item_bytes": 524288,
+    "max_content_bytes": 2097152
+  },
+  "content_bytes": 439,
+  "archive_files": [
+    "manifest.json",
+    "components/version.json",
+    "config/redacted.json",
+    "health/components.json",
+    "events/domain-events.json",
+    "metrics/overview.json",
+    "requests/metadata.json",
+    "logs/request-logs.json"
+  ],
+  "items": [
+    {
+      "key": "component_versions",
+      "path": "components/version.json",
+      "status": "included",
+      "count": 1,
+      "bytes": 192,
+      "truncated": false,
+      "reason": null
+    },
+    {
+      "key": "configuration",
+      "path": "config/redacted.json",
+      "status": "included",
+      "count": 1,
+      "bytes": 167,
+      "truncated": false,
+      "reason": null
+    },
+    {
+      "key": "health",
+      "path": "health/components.json",
+      "status": "included",
+      "count": 1,
+      "bytes": 22,
+      "truncated": false,
+      "reason": null
+    },
+    {
+      "key": "structured_events",
+      "path": "events/domain-events.json",
+      "status": "included",
+      "count": 0,
+      "bytes": 12,
+      "truncated": false,
+      "reason": null
+    },
+    {
+      "key": "metrics",
+      "path": "metrics/overview.json",
+      "status": "included",
+      "count": 1,
+      "bytes": 22,
+      "truncated": false,
+      "reason": null
+    },
+    {
+      "key": "request_records",
+      "path": "requests/metadata.json",
+      "status": "included",
+      "count": 0,
+      "bytes": 12,
+      "truncated": false,
+      "reason": null
+    },
+    {
+      "key": "sanitized_logs",
+      "path": "logs/request-logs.json",
+      "status": "included",
+      "count": 0,
+      "bytes": 12,
+      "truncated": false,
+      "reason": null
+    }
+  ]
+}

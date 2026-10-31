@@ -1,0 +1,456 @@
+{
+  "$defs": {
+    "AgentAvailableResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "gpus": {
+          "$ref": "#/$defs/GpuInventoryResponse"
+        },
+        "host": {
+          "$ref": "#/$defs/HostInfoResponse"
+        },
+        "status": {
+          "const": "available",
+          "default": "available",
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "host",
+        "gpus"
+      ],
+      "title": "AgentAvailableResponse",
+      "type": "object"
+    },
+    "AgentResponse": {
+      "discriminator": {
+        "mapping": {
+          "available": "#/$defs/AgentAvailableResponse",
+          "unavailable": "#/$defs/AgentUnavailableResponse"
+        },
+        "propertyName": "status"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/AgentAvailableResponse"
+        },
+        {
+          "$ref": "#/$defs/AgentUnavailableResponse"
+        }
+      ]
+    },
+    "AgentUnavailableReason": {
+      "description": "Sanitized connection outcomes safe for the public management API.",
+      "enum": [
+        "connection_failed",
+        "timeout",
+        "access_denied",
+        "rpc_failed"
+      ],
+      "title": "AgentUnavailableReason",
+      "type": "string"
+    },
+    "AgentUnavailableResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "$ref": "#/$defs/AgentUnavailableReason"
+        },
+        "status": {
+          "const": "unavailable",
+          "default": "unavailable",
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason"
+      ],
+      "title": "AgentUnavailableResponse",
+      "type": "object"
+    },
+    "GpuDeviceResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "display_index": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Display Index"
+        },
+        "health": {
+          "$ref": "#/$defs/GpuHealthState"
+        },
+        "health_reasons": {
+          "items": {
+            "$ref": "#/$defs/GpuHealthReason"
+          },
+          "title": "Health Reasons",
+          "type": "array"
+        },
+        "memory_bytes": {
+          "minimum": 0,
+          "title": "Memory Bytes",
+          "type": "integer"
+        },
+        "model": {
+          "minLength": 1,
+          "title": "Model",
+          "type": "string"
+        },
+        "uuid": {
+          "minLength": 1,
+          "title": "Uuid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "uuid",
+        "model",
+        "memory_bytes",
+        "health",
+        "health_reasons"
+      ],
+      "title": "GpuDeviceResponse",
+      "type": "object"
+    },
+    "GpuDiscoveryFailureReason": {
+      "enum": [
+        "none",
+        "no_devices",
+        "library_unavailable",
+        "driver_unavailable",
+        "permission_denied",
+        "initialization_failed",
+        "enumeration_failed",
+        "snapshot_changed",
+        "protocol_invalid"
+      ],
+      "title": "GpuDiscoveryFailureReason",
+      "type": "string"
+    },
+    "GpuDiscoveryState": {
+      "enum": [
+        "ready",
+        "no_devices",
+        "unavailable"
+      ],
+      "title": "GpuDiscoveryState",
+      "type": "string"
+    },
+    "GpuHealthReason": {
+      "enum": [
+        "ecc_errors_detected",
+        "query_unsupported",
+        "query_failed",
+        "protocol_invalid"
+      ],
+      "title": "GpuHealthReason",
+      "type": "string"
+    },
+    "GpuHealthState": {
+      "enum": [
+        "healthy",
+        "unhealthy",
+        "unknown"
+      ],
+      "title": "GpuHealthState",
+      "type": "string"
+    },
+    "GpuInventoryResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "devices": {
+          "items": {
+            "$ref": "#/$defs/GpuDeviceResponse"
+          },
+          "title": "Devices",
+          "type": "array"
+        },
+        "discovery_state": {
+          "$ref": "#/$defs/GpuDiscoveryState"
+        },
+        "failure_reason": {
+          "$ref": "#/$defs/GpuDiscoveryFailureReason"
+        },
+        "snapshot_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Snapshot Id"
+        },
+        "topology_links": {
+          "items": {
+            "$ref": "#/$defs/GpuTopologyLinkResponse"
+          },
+          "title": "Topology Links",
+          "type": "array"
+        }
+      },
+      "required": [
+        "discovery_state",
+        "failure_reason",
+        "devices",
+        "topology_links"
+      ],
+      "title": "GpuInventoryResponse",
+      "type": "object"
+    },
+    "GpuTopologyLinkResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "gpu_a_uuid": {
+          "minLength": 1,
+          "title": "Gpu A Uuid",
+          "type": "string"
+        },
+        "gpu_b_uuid": {
+          "minLength": 1,
+          "title": "Gpu B Uuid",
+          "type": "string"
+        },
+        "nvlink_state": {
+          "$ref": "#/$defs/TopologyState"
+        },
+        "p2p_read_state": {
+          "$ref": "#/$defs/TopologyState"
+        },
+        "pcie_relation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PcieRelation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "pcie_state": {
+          "$ref": "#/$defs/TopologyState"
+        }
+      },
+      "required": [
+        "gpu_a_uuid",
+        "gpu_b_uuid",
+        "pcie_state",
+        "nvlink_state",
+        "p2p_read_state"
+      ],
+      "title": "GpuTopologyLinkResponse",
+      "type": "object"
+    },
+    "HostInfoResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "available_disk_bytes": {
+          "$ref": "#/$defs/UInt64Observation"
+        },
+        "cuda_driver_version": {
+          "$ref": "#/$defs/StringObservation"
+        },
+        "driver_version": {
+          "$ref": "#/$defs/StringObservation"
+        },
+        "logical_cpu_count": {
+          "$ref": "#/$defs/UInt64Observation"
+        },
+        "total_disk_bytes": {
+          "$ref": "#/$defs/UInt64Observation"
+        },
+        "total_memory_bytes": {
+          "$ref": "#/$defs/UInt64Observation"
+        }
+      },
+      "required": [
+        "logical_cpu_count",
+        "total_memory_bytes",
+        "total_disk_bytes",
+        "available_disk_bytes",
+        "driver_version",
+        "cuda_driver_version"
+      ],
+      "title": "HostInfoResponse",
+      "type": "object"
+    },
+    "KnownString": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "const": "known",
+          "default": "known",
+          "title": "State",
+          "type": "string"
+        },
+        "value": {
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "KnownString",
+      "type": "object"
+    },
+    "KnownUInt64": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "const": "known",
+          "default": "known",
+          "title": "State",
+          "type": "string"
+        },
+        "value": {
+          "minimum": 0,
+          "title": "Value",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "KnownUInt64",
+      "type": "object"
+    },
+    "ObservationUnknownReason": {
+      "enum": [
+        "not_collected",
+        "source_unavailable",
+        "empty_value",
+        "query_failed",
+        "not_deployed",
+        "protocol_invalid"
+      ],
+      "title": "ObservationUnknownReason",
+      "type": "string"
+    },
+    "PcieRelation": {
+      "enum": [
+        "internal",
+        "single_switch",
+        "multiple_switches",
+        "host_bridge",
+        "numa_node",
+        "system"
+      ],
+      "title": "PcieRelation",
+      "type": "string"
+    },
+    "StringObservation": {
+      "discriminator": {
+        "mapping": {
+          "known": "#/$defs/KnownString",
+          "unknown": "#/$defs/UnknownString"
+        },
+        "propertyName": "state"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/KnownString"
+        },
+        {
+          "$ref": "#/$defs/UnknownString"
+        }
+      ]
+    },
+    "TopologyState": {
+      "enum": [
+        "present",
+        "absent",
+        "unsupported",
+        "query_failed"
+      ],
+      "title": "TopologyState",
+      "type": "string"
+    },
+    "UInt64Observation": {
+      "discriminator": {
+        "mapping": {
+          "known": "#/$defs/KnownUInt64",
+          "unknown": "#/$defs/UnknownUInt64"
+        },
+        "propertyName": "state"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/KnownUInt64"
+        },
+        {
+          "$ref": "#/$defs/UnknownUInt64"
+        }
+      ]
+    },
+    "UnknownString": {
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "$ref": "#/$defs/ObservationUnknownReason"
+        },
+        "state": {
+          "const": "unknown",
+          "default": "unknown",
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason"
+      ],
+      "title": "UnknownString",
+      "type": "object"
+    },
+    "UnknownUInt64": {
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "$ref": "#/$defs/ObservationUnknownReason"
+        },
+        "state": {
+          "const": "unknown",
+          "default": "unknown",
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason"
+      ],
+      "title": "UnknownUInt64",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "agent": {
+      "$ref": "#/$defs/AgentResponse"
+    },
+    "observed_at": {
+      "format": "date-time",
+      "title": "Observed At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "observed_at",
+    "agent"
+  ],
+  "title": "SystemServerResponse",
+  "type": "object"
+}

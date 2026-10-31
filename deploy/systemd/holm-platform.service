@@ -1,0 +1,16 @@
+[Unit]
+Description=Private AI Workspace Platform
+Requires=docker.service holm-host-agent.service
+Wants=network-online.target
+After=docker.service network-online.target holm-host-agent.service
+PartOf=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+Environment=HOLM_CONFIG_ROOT=/etc/holm HOLM_DATA_ROOT=/var/lib/holm
+WorkingDirectory=/opt/holm/current
+ExecStart=/usr/bin/docker compose --project-name holm --file /opt/holm/current/compose.yaml up --detach
+
+[Install]
+WantedBy=multi-user.target

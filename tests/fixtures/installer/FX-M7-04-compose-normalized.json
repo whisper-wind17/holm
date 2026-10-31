@@ -1,0 +1,794 @@
+{
+  "name": "holm-m704",
+  "networks": {
+    "holm-app": {
+      "name": "holm-m704_holm-app",
+      "driver": "bridge",
+      "ipam": {}
+    },
+    "holm-runtime": {
+      "name": "holm-m704_holm-runtime",
+      "driver": "bridge",
+      "ipam": {},
+      "internal": true
+    }
+  },
+  "secrets": {
+    "api_key_pepper_keyring": {
+      "name": "holm-m704_api_key_pepper_keyring",
+      "file": "/FX-M7-04/secrets/api_key_pepper_keyring"
+    },
+    "control_database_url": {
+      "name": "holm-m704_control_database_url",
+      "file": "/FX-M7-04/secrets/control_database_url"
+    },
+    "download_database_url": {
+      "name": "holm-m704_download_database_url",
+      "file": "/FX-M7-04/secrets/download_database_url"
+    },
+    "gateway_api_key_pepper_keyring": {
+      "name": "holm-m704_gateway_api_key_pepper_keyring",
+      "file": "/FX-M7-04/secrets/gateway_api_key_pepper_keyring"
+    },
+    "gateway_database_url": {
+      "name": "holm-m704_gateway_database_url",
+      "file": "/FX-M7-04/secrets/gateway_database_url"
+    },
+    "idempotency_hmac_secret": {
+      "name": "holm-m704_idempotency_hmac_secret",
+      "file": "/FX-M7-04/secrets/idempotency_hmac_secret"
+    },
+    "instance_database_url": {
+      "name": "holm-m704_instance_database_url",
+      "file": "/FX-M7-04/secrets/instance_database_url"
+    },
+    "ledger_database_url": {
+      "name": "holm-m704_ledger_database_url",
+      "file": "/FX-M7-04/secrets/ledger_database_url"
+    },
+    "maintenance_database_url": {
+      "name": "holm-m704_maintenance_database_url",
+      "file": "/FX-M7-04/secrets/maintenance_database_url"
+    },
+    "master_keyring": {
+      "name": "holm-m704_master_keyring",
+      "file": "/FX-M7-04/secrets/master_keyring"
+    },
+    "migrate_database_url": {
+      "name": "holm-m704_migrate_database_url",
+      "file": "/FX-M7-04/secrets/migrate_database_url"
+    },
+    "model_source_credentials": {
+      "name": "holm-m704_model_source_credentials",
+      "file": "/FX-M7-04/secrets/model_source_credentials"
+    },
+    "postgres_password": {
+      "name": "holm-m704_postgres_password",
+      "file": "/FX-M7-04/secrets/postgres_password"
+    }
+  },
+  "services": {
+    "control-api": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [
+        "python",
+        "-m",
+        "holm_control_api",
+        "--config",
+        "/etc/holm/platform.yaml",
+        "--database-url-file",
+        "/run/secrets/control_database_url",
+        "--master-keyring-file",
+        "/run/secrets/master_keyring",
+        "--api-key-pepper-keyring-file",
+        "/run/secrets/api_key_pepper_keyring",
+        "--idempotency-hmac-secret-file",
+        "/run/secrets/idempotency_hmac_secret",
+        "--agent-socket",
+        "/run/holm/agent.sock",
+        "--gateway-health-url",
+        "http://gateway:8001",
+        "--edge-health-url",
+        "http://edge:8081",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000"
+      ],
+      "depends_on": {
+        "migrate": {
+          "condition": "service_completed_successfully",
+          "required": true
+        },
+        "postgres": {
+          "condition": "service_healthy",
+          "required": true
+        }
+      },
+      "entrypoint": null,
+      "group_add": [
+        "10009"
+      ],
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "holm-healthcheck",
+          "http",
+          "http://127.0.0.1:8000/internal/health/ready"
+        ],
+        "timeout": "3s",
+        "interval": "5s",
+        "retries": 12,
+        "start_period": "10s"
+      },
+      "image": "holm/application:0.1.0",
+      "networks": {
+        "holm-app": null,
+        "holm-runtime": null
+      },
+      "read_only": true,
+      "restart": "unless-stopped",
+      "secrets": [
+        {
+          "source": "control_database_url",
+          "target": "/run/secrets/control_database_url"
+        },
+        {
+          "source": "master_keyring",
+          "target": "/run/secrets/master_keyring"
+        },
+        {
+          "source": "api_key_pepper_keyring",
+          "target": "/run/secrets/api_key_pepper_keyring"
+        },
+        {
+          "source": "idempotency_hmac_secret",
+          "target": "/run/secrets/idempotency_hmac_secret"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,nodev,size=64m,uid=10003,gid=10003"
+      ],
+      "user": "10003:10003",
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "/var/lib/holm/external-models",
+          "target": "/var/lib/holm/external-models",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/FX-M7-04/config/platform.yaml",
+          "target": "/etc/holm/platform.yaml",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/run/holm",
+          "target": "/run/holm",
+          "read_only": true
+        }
+      ]
+    },
+    "download-worker": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [
+        "holm-download-worker",
+        "--database-url-file",
+        "/run/secrets/download_database_url",
+        "--master-keyring-file",
+        "/run/secrets/master_keyring",
+        "--instance-id",
+        "download-worker-1",
+        "--build-version",
+        "0.1.0",
+        "--model-root",
+        "/var/lib/holm/models",
+        "--tokenizer-root",
+        "/var/lib/holm/tokenizers",
+        "--agent-socket",
+        "/run/holm/agent.sock",
+        "--external-model-root",
+        "/var/lib/holm/external-models"
+      ],
+      "depends_on": {
+        "migrate": {
+          "condition": "service_completed_successfully",
+          "required": true
+        },
+        "postgres": {
+          "condition": "service_healthy",
+          "required": true
+        }
+      },
+      "entrypoint": null,
+      "group_add": [
+        "10009"
+      ],
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "holm-healthcheck",
+          "heartbeat",
+          "--database-url-file",
+          "/run/secrets/download_database_url",
+          "--component",
+          "download-worker",
+          "--instance-id",
+          "download-worker-1",
+          "--require-socket",
+          "/run/holm/agent.sock"
+        ],
+        "timeout": "5s",
+        "interval": "10s",
+        "retries": 6,
+        "start_period": "30s"
+      },
+      "image": "holm/application:0.1.0",
+      "networks": {
+        "holm-app": null
+      },
+      "read_only": true,
+      "restart": "unless-stopped",
+      "secrets": [
+        {
+          "source": "download_database_url",
+          "target": "/run/secrets/download_database_url"
+        },
+        {
+          "source": "master_keyring",
+          "target": "/run/secrets/master_keyring"
+        },
+        {
+          "source": "model_source_credentials",
+          "target": "/run/secrets/model_source_credentials"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,nodev,size=256m,uid=10005,gid=10003"
+      ],
+      "user": "10005:10003",
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "/FX-M7-04/data/models",
+          "target": "/var/lib/holm/models"
+        },
+        {
+          "type": "bind",
+          "source": "/FX-M7-04/data/tokenizers",
+          "target": "/var/lib/holm/tokenizers"
+        },
+        {
+          "type": "bind",
+          "source": "/var/lib/holm/external-models",
+          "target": "/var/lib/holm/external-models",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/FX-M7-04/config/platform.yaml",
+          "target": "/etc/holm/platform.yaml",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/run/holm",
+          "target": "/run/holm",
+          "read_only": true
+        }
+      ]
+    },
+    "edge": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": null,
+      "entrypoint": null,
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "caddy",
+          "version"
+        ],
+        "timeout": "3s",
+        "interval": "10s",
+        "retries": 6,
+        "start_period": "10s"
+      },
+      "image": "holm/edge:0.1.0",
+      "networks": {
+        "holm-app": null
+      },
+      "ports": [
+        {
+          "mode": "ingress",
+          "target": 8080,
+          "published": "80",
+          "protocol": "tcp"
+        },
+        {
+          "mode": "ingress",
+          "target": 8443,
+          "published": "443",
+          "protocol": "tcp"
+        }
+      ],
+      "read_only": true,
+      "restart": "unless-stopped",
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,nodev,size=64m,uid=10001,gid=10001"
+      ],
+      "user": "10001:10001",
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "/FX-M7-04/config/Caddyfile",
+          "target": "/etc/caddy/Caddyfile",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/FX-M7-04/data/caddy/data",
+          "target": "/data"
+        },
+        {
+          "type": "bind",
+          "source": "/FX-M7-04/data/caddy/config",
+          "target": "/config"
+        },
+        {
+          "type": "bind",
+          "source": "/FX-M7-04/data/caddy/tls",
+          "target": "/etc/caddy/tls",
+          "read_only": true
+        }
+      ]
+    },
+    "gateway": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [
+        "holm-gateway",
+        "--database-url-file",
+        "/run/secrets/gateway_database_url",
+        "--api-key-pepper-keyring-file",
+        "/run/secrets/api_key_pepper_keyring",
+        "--runtime-compatibility",
+        "/opt/holm/runtime-compat.yaml",
+        "--request-ledger-path",
+        "/var/lib/holm/spool/request-ledger.sqlite3",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8001"
+      ],
+      "depends_on": {
+        "migrate": {
+          "condition": "service_completed_successfully",
+          "required": true
+        },
+        "postgres": {
+          "condition": "service_healthy",
+          "required": true
+        }
+      },
+      "entrypoint": null,
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "holm-healthcheck",
+          "http",
+          "http://127.0.0.1:8001/internal/health/live"
+        ],
+        "timeout": "3s",
+        "interval": "5s",
+        "retries": 12,
+        "start_period": "10s"
+      },
+      "image": "holm/application:0.1.0",
+      "networks": {
+        "holm-app": null,
+        "holm-runtime": null
+      },
+      "read_only": true,
+      "restart": "unless-stopped",
+      "secrets": [
+        {
+          "source": "gateway_database_url",
+          "target": "/run/secrets/gateway_database_url"
+        },
+        {
+          "source": "gateway_api_key_pepper_keyring",
+          "target": "api_key_pepper_keyring"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,nodev,size=64m,uid=10004,gid=10004"
+      ],
+      "user": "10004:10004",
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "/FX-M7-04/data/spool",
+          "target": "/var/lib/holm/spool"
+        },
+        {
+          "type": "bind",
+          "source": "/FX-M7-04/data/tokenizers",
+          "target": "/var/lib/holm/tokenizers",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/FX-M7-04/config/platform.yaml",
+          "target": "/etc/holm/platform.yaml",
+          "read_only": true
+        }
+      ]
+    },
+    "instance-controller": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [
+        "holm-instance-controller",
+        "--database-url-file",
+        "/run/secrets/instance_database_url",
+        "--agent-socket",
+        "/run/holm/agent.sock",
+        "--runtime-compatibility",
+        "/opt/holm/runtime-compat.yaml",
+        "--release-manifest",
+        "/etc/holm/release-manifest.json"
+      ],
+      "depends_on": {
+        "migrate": {
+          "condition": "service_completed_successfully",
+          "required": true
+        },
+        "postgres": {
+          "condition": "service_healthy",
+          "required": true
+        }
+      },
+      "entrypoint": null,
+      "group_add": [
+        "10009"
+      ],
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "holm-healthcheck",
+          "heartbeat",
+          "--database-url-file",
+          "/run/secrets/instance_database_url",
+          "--component",
+          "instance-controller",
+          "--instance-id",
+          "instance-controller",
+          "--require-socket",
+          "/run/holm/agent.sock"
+        ],
+        "timeout": "5s",
+        "interval": "10s",
+        "retries": 6,
+        "start_period": "1m30s"
+      },
+      "image": "holm/application:0.1.0",
+      "networks": {
+        "holm-app": null,
+        "holm-runtime": null
+      },
+      "read_only": true,
+      "restart": "unless-stopped",
+      "secrets": [
+        {
+          "source": "instance_database_url",
+          "target": "/run/secrets/instance_database_url"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,nodev,size=64m,uid=10006,gid=10006"
+      ],
+      "user": "10006:10006",
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "/FX-M7-04/config/release-manifest.json",
+          "target": "/etc/holm/release-manifest.json",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/FX-M7-04/config/platform.yaml",
+          "target": "/etc/holm/platform.yaml",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/run/holm",
+          "target": "/run/holm",
+          "read_only": true
+        }
+      ]
+    },
+    "ledger-writer": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [
+        "holm-ledger-writer",
+        "--database-url-file",
+        "/run/secrets/ledger_database_url",
+        "--request-ledger-path",
+        "/var/lib/holm/spool/request-ledger.sqlite3",
+        "--release-manifest",
+        "/etc/holm/release-manifest.json",
+        "--instance-id",
+        "ledger-writer-1",
+        "--build-version",
+        "0.1.0"
+      ],
+      "depends_on": {
+        "migrate": {
+          "condition": "service_completed_successfully",
+          "required": true
+        },
+        "postgres": {
+          "condition": "service_healthy",
+          "required": true
+        }
+      },
+      "entrypoint": null,
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "holm-healthcheck",
+          "heartbeat",
+          "--database-url-file",
+          "/run/secrets/ledger_database_url",
+          "--component",
+          "ledger-writer",
+          "--instance-id",
+          "ledger-writer-1"
+        ],
+        "timeout": "5s",
+        "interval": "10s",
+        "retries": 6,
+        "start_period": "30s"
+      },
+      "image": "holm/application:0.1.0",
+      "networks": {
+        "holm-app": null
+      },
+      "read_only": true,
+      "restart": "unless-stopped",
+      "secrets": [
+        {
+          "source": "ledger_database_url",
+          "target": "/run/secrets/ledger_database_url"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,nodev,size=64m,uid=10004,gid=10004"
+      ],
+      "user": "10004:10004",
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "/FX-M7-04/data/spool",
+          "target": "/var/lib/holm/spool"
+        },
+        {
+          "type": "bind",
+          "source": "/FX-M7-04/config/release-manifest.json",
+          "target": "/etc/holm/release-manifest.json",
+          "read_only": true
+        }
+      ]
+    },
+    "maintenance-worker": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [
+        "holm-maintenance-worker",
+        "--database-url-file",
+        "/run/secrets/maintenance_database_url",
+        "--backup-root",
+        "/var/lib/holm/backups",
+        "--model-root",
+        "/var/lib/holm/models",
+        "--external-model-root",
+        "/var/lib/holm/external-models",
+        "--instance-id",
+        "maintenance-worker-1",
+        "--build-version",
+        "0.1.0"
+      ],
+      "depends_on": {
+        "migrate": {
+          "condition": "service_completed_successfully",
+          "required": true
+        },
+        "postgres": {
+          "condition": "service_healthy",
+          "required": true
+        }
+      },
+      "entrypoint": null,
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "holm-healthcheck",
+          "heartbeat",
+          "--database-url-file",
+          "/run/secrets/maintenance_database_url",
+          "--component",
+          "maintenance-worker",
+          "--instance-id",
+          "maintenance-worker-1"
+        ],
+        "timeout": "5s",
+        "interval": "10s",
+        "retries": 6,
+        "start_period": "30s"
+      },
+      "image": "holm/application:0.1.0",
+      "networks": {
+        "holm-app": null
+      },
+      "read_only": true,
+      "restart": "unless-stopped",
+      "secrets": [
+        {
+          "source": "maintenance_database_url",
+          "target": "/run/secrets/maintenance_database_url"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,nodev,size=64m,uid=10007,gid=10007"
+      ],
+      "user": "10007:10007",
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "/FX-M7-04/data/backups",
+          "target": "/var/lib/holm/backups"
+        },
+        {
+          "type": "bind",
+          "source": "/FX-M7-04/data/models",
+          "target": "/var/lib/holm/models",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/var/lib/holm/external-models",
+          "target": "/var/lib/holm/external-models",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/FX-M7-04/config/platform.yaml",
+          "target": "/etc/holm/platform.yaml",
+          "read_only": true
+        }
+      ]
+    },
+    "migrate": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [
+        "python",
+        "-c",
+        "from pathlib import Path; from sqlalchemy import create_engine; from holm_persistence import upgrade_to_head; engine=create_engine(Path('/run/secrets/migrate_database_url').read_text(encoding='utf-8').strip()); connection=engine.connect(); upgrade_to_head(connection, Path('/opt/holm/migrations/alembic.ini')); connection.close(); engine.dispose()"
+      ],
+      "depends_on": {
+        "postgres": {
+          "condition": "service_healthy",
+          "required": true
+        }
+      },
+      "entrypoint": null,
+      "image": "holm/application:0.1.0",
+      "networks": {
+        "holm-app": null
+      },
+      "read_only": true,
+      "restart": "no",
+      "secrets": [
+        {
+          "source": "migrate_database_url",
+          "target": "/run/secrets/migrate_database_url"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,nodev,size=64m,uid=10002,gid=10002"
+      ],
+      "user": "10002:10002"
+    },
+    "postgres": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": null,
+      "entrypoint": null,
+      "environment": {
+        "PGDATA": "/var/lib/postgresql/data/pgdata",
+        "POSTGRES_DB": "holm",
+        "POSTGRES_PASSWORD_FILE": "/run/secrets/postgres_password",
+        "POSTGRES_USER": "holm_bootstrap"
+      },
+      "healthcheck": {
+        "test": [
+          "CMD-SHELL",
+          "pg_isready -U holm_bootstrap -d holm"
+        ],
+        "timeout": "5s",
+        "interval": "5s",
+        "retries": 12,
+        "start_period": "10s"
+      },
+      "image": "holm/postgres:16.15-alpine",
+      "networks": {
+        "holm-app": null
+      },
+      "read_only": true,
+      "restart": "unless-stopped",
+      "secrets": [
+        {
+          "source": "postgres_password",
+          "target": "/run/secrets/postgres_password"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,nodev,size=64m,uid=70,gid=70",
+        "/var/run/postgresql:rw,noexec,nosuid,nodev,size=16m,uid=70,gid=70"
+      ],
+      "user": "70:70",
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "/FX-M7-04/data/postgres",
+          "target": "/var/lib/postgresql/data"
+        }
+      ]
+    }
+  }
+}

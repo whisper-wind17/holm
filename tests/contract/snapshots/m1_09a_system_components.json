@@ -1,0 +1,638 @@
+{
+  "$defs": {
+    "ComponentDetails": {
+      "discriminator": {
+        "mapping": {
+          "database": "#/$defs/DatabaseDetails",
+          "none": "#/$defs/NoComponentDetails",
+          "request_ledger_writer": "#/$defs/RequestLedgerWriterDetails"
+        },
+        "propertyName": "kind"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/NoComponentDetails"
+        },
+        {
+          "$ref": "#/$defs/RequestLedgerWriterDetails"
+        },
+        {
+          "$ref": "#/$defs/DatabaseDetails"
+        }
+      ]
+    },
+    "ComponentSignalSource": {
+      "enum": [
+        "self",
+        "database",
+        "heartbeat",
+        "jobs",
+        "ledger_backlog",
+        "agent",
+        "probe"
+      ],
+      "title": "ComponentSignalSource",
+      "type": "string"
+    },
+    "ComponentSummaryResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "abnormal_count": {
+          "minimum": 0,
+          "title": "Abnormal Count",
+          "type": "integer"
+        },
+        "not_deployed_count": {
+          "minimum": 0,
+          "title": "Not Deployed Count",
+          "type": "integer"
+        },
+        "ready_count": {
+          "minimum": 0,
+          "title": "Ready Count",
+          "type": "integer"
+        },
+        "status": {
+          "$ref": "#/$defs/PlatformAggregateStatus"
+        }
+      },
+      "required": [
+        "status",
+        "ready_count",
+        "abnormal_count",
+        "not_deployed_count"
+      ],
+      "title": "ComponentSummaryResponse",
+      "type": "object"
+    },
+    "DatabaseDetails": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "database",
+          "default": "database",
+          "title": "Kind",
+          "type": "string"
+        },
+        "schema_revision": {
+          "$ref": "#/$defs/StringObservation"
+        }
+      },
+      "required": [
+        "schema_revision"
+      ],
+      "title": "DatabaseDetails",
+      "type": "object"
+    },
+    "DriverCompatibility": {
+      "enum": [
+        "compatible",
+        "incompatible",
+        "unknown"
+      ],
+      "title": "DriverCompatibility",
+      "type": "string"
+    },
+    "DriverCompatibilityReason": {
+      "enum": [
+        "meets_minimum",
+        "below_minimum",
+        "agent_unavailable",
+        "driver_unavailable",
+        "minimum_not_declared",
+        "version_unparseable"
+      ],
+      "title": "DriverCompatibilityReason",
+      "type": "string"
+    },
+    "HostEnvironmentId": {
+      "enum": [
+        "nvidia_driver",
+        "docker",
+        "compose",
+        "nvidia_container_toolkit"
+      ],
+      "title": "HostEnvironmentId",
+      "type": "string"
+    },
+    "HostEnvironmentItem": {
+      "additionalProperties": false,
+      "properties": {
+        "current": {
+          "$ref": "#/$defs/StringObservation"
+        },
+        "id": {
+          "$ref": "#/$defs/HostEnvironmentId"
+        },
+        "minimum": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Minimum"
+        },
+        "reason": {
+          "$ref": "#/$defs/HostEnvironmentReason"
+        },
+        "status": {
+          "$ref": "#/$defs/HostEnvironmentStatus"
+        }
+      },
+      "required": [
+        "id",
+        "current",
+        "minimum",
+        "status",
+        "reason"
+      ],
+      "title": "HostEnvironmentItem",
+      "type": "object"
+    },
+    "HostEnvironmentReason": {
+      "enum": [
+        "meets_minimum",
+        "below_minimum",
+        "agent_unavailable",
+        "current_unavailable",
+        "minimum_not_declared",
+        "version_unparseable"
+      ],
+      "title": "HostEnvironmentReason",
+      "type": "string"
+    },
+    "HostEnvironmentResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "cuda_driver_version": {
+          "$ref": "#/$defs/StringObservation"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/HostEnvironmentItem"
+          },
+          "title": "Items",
+          "type": "array"
+        }
+      },
+      "required": [
+        "cuda_driver_version",
+        "items"
+      ],
+      "title": "HostEnvironmentResponse",
+      "type": "object"
+    },
+    "HostEnvironmentStatus": {
+      "enum": [
+        "satisfied",
+        "unsatisfied",
+        "unknown"
+      ],
+      "title": "HostEnvironmentStatus",
+      "type": "string"
+    },
+    "InferenceEngineResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "active_instance_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Active Instance Count"
+        },
+        "driver_compatibility": {
+          "$ref": "#/$defs/DriverCompatibility"
+        },
+        "image_digest": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Image Digest"
+        },
+        "launcher": {
+          "title": "Launcher",
+          "type": "string"
+        },
+        "minimum_driver_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Minimum Driver Version"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "reason": {
+          "$ref": "#/$defs/DriverCompatibilityReason"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "launcher",
+        "image_digest",
+        "active_instance_count",
+        "minimum_driver_version",
+        "driver_compatibility",
+        "reason"
+      ],
+      "title": "InferenceEngineResponse",
+      "type": "object"
+    },
+    "KnownString": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "const": "known",
+          "default": "known",
+          "title": "State",
+          "type": "string"
+        },
+        "value": {
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "KnownString",
+      "type": "object"
+    },
+    "KnownTimestamp": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "const": "known",
+          "default": "known",
+          "title": "State",
+          "type": "string"
+        },
+        "value": {
+          "format": "date-time",
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "KnownTimestamp",
+      "type": "object"
+    },
+    "KnownUInt64": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "const": "known",
+          "default": "known",
+          "title": "State",
+          "type": "string"
+        },
+        "value": {
+          "minimum": 0,
+          "title": "Value",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "KnownUInt64",
+      "type": "object"
+    },
+    "NoComponentDetails": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "none",
+          "default": "none",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "title": "NoComponentDetails",
+      "type": "object"
+    },
+    "ObservationUnknownReason": {
+      "enum": [
+        "not_collected",
+        "source_unavailable",
+        "empty_value",
+        "query_failed",
+        "not_deployed",
+        "protocol_invalid"
+      ],
+      "title": "ObservationUnknownReason",
+      "type": "string"
+    },
+    "PlatformAggregateStatus": {
+      "enum": [
+        "ready",
+        "degraded"
+      ],
+      "title": "PlatformAggregateStatus",
+      "type": "string"
+    },
+    "PlatformVersionResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "build_version": {
+          "title": "Build Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "build_version"
+      ],
+      "title": "PlatformVersionResponse",
+      "type": "object"
+    },
+    "RequestLedgerWriterDetails": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "request_ledger_writer",
+          "default": "request_ledger_writer",
+          "title": "Kind",
+          "type": "string"
+        },
+        "oldest_event_at": {
+          "$ref": "#/$defs/TimestampObservation"
+        },
+        "pending_event_count": {
+          "$ref": "#/$defs/UInt64Observation"
+        }
+      },
+      "required": [
+        "pending_event_count",
+        "oldest_event_at"
+      ],
+      "title": "RequestLedgerWriterDetails",
+      "type": "object"
+    },
+    "StringObservation": {
+      "discriminator": {
+        "mapping": {
+          "known": "#/$defs/KnownString",
+          "unknown": "#/$defs/UnknownString"
+        },
+        "propertyName": "state"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/KnownString"
+        },
+        {
+          "$ref": "#/$defs/UnknownString"
+        }
+      ]
+    },
+    "SystemComponentId": {
+      "enum": [
+        "Edge",
+        "Control Plane",
+        "Telemetry Collector",
+        "Gateway",
+        "Scheduler",
+        "Download Manager",
+        "Request Ledger Writer",
+        "Maintenance",
+        "Database",
+        "Host Agent"
+      ],
+      "title": "SystemComponentId",
+      "type": "string"
+    },
+    "SystemComponentReason": {
+      "enum": [
+        "probe_ready",
+        "probe_unreachable",
+        "gateway_route_snapshot_unavailable",
+        "gateway_ledger_unavailable",
+        "agent_available",
+        "agent_unavailable",
+        "self_ready",
+        "dependency_ready",
+        "dependency_unavailable",
+        "heartbeat_fresh",
+        "heartbeat_stale",
+        "heartbeat_degraded",
+        "heartbeat_stopping",
+        "no_heartbeat",
+        "no_signal_source",
+        "signal_unavailable",
+        "scheduler_backlog",
+        "scheduler_leases_expired",
+        "ledger_backlog",
+        "ledger_unavailable"
+      ],
+      "title": "SystemComponentReason",
+      "type": "string"
+    },
+    "SystemComponentResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "details": {
+          "$ref": "#/$defs/ComponentDetails"
+        },
+        "id": {
+          "$ref": "#/$defs/SystemComponentId"
+        },
+        "reason": {
+          "$ref": "#/$defs/SystemComponentReason"
+        },
+        "signal_sources": {
+          "items": {
+            "$ref": "#/$defs/ComponentSignalSource"
+          },
+          "title": "Signal Sources",
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/SystemComponentStatus"
+        },
+        "version": {
+          "$ref": "#/$defs/StringObservation"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "reason",
+        "version",
+        "signal_sources",
+        "details"
+      ],
+      "title": "SystemComponentResponse",
+      "type": "object"
+    },
+    "SystemComponentStatus": {
+      "enum": [
+        "ready",
+        "degraded",
+        "unavailable",
+        "not_deployed"
+      ],
+      "title": "SystemComponentStatus",
+      "type": "string"
+    },
+    "TimestampObservation": {
+      "discriminator": {
+        "mapping": {
+          "known": "#/$defs/KnownTimestamp",
+          "unknown": "#/$defs/UnknownValue"
+        },
+        "propertyName": "state"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/KnownTimestamp"
+        },
+        {
+          "$ref": "#/$defs/UnknownValue"
+        }
+      ]
+    },
+    "UInt64Observation": {
+      "discriminator": {
+        "mapping": {
+          "known": "#/$defs/KnownUInt64",
+          "unknown": "#/$defs/UnknownUInt64"
+        },
+        "propertyName": "state"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/KnownUInt64"
+        },
+        {
+          "$ref": "#/$defs/UnknownUInt64"
+        }
+      ]
+    },
+    "UnknownString": {
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "$ref": "#/$defs/ObservationUnknownReason"
+        },
+        "state": {
+          "const": "unknown",
+          "default": "unknown",
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason"
+      ],
+      "title": "UnknownString",
+      "type": "object"
+    },
+    "UnknownUInt64": {
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "$ref": "#/$defs/ObservationUnknownReason"
+        },
+        "state": {
+          "const": "unknown",
+          "default": "unknown",
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason"
+      ],
+      "title": "UnknownUInt64",
+      "type": "object"
+    },
+    "UnknownValue": {
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "$ref": "#/$defs/ObservationUnknownReason"
+        },
+        "state": {
+          "const": "unknown",
+          "default": "unknown",
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason"
+      ],
+      "title": "UnknownValue",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "components": {
+      "items": {
+        "$ref": "#/$defs/SystemComponentResponse"
+      },
+      "title": "Components",
+      "type": "array"
+    },
+    "host_environment": {
+      "$ref": "#/$defs/HostEnvironmentResponse"
+    },
+    "inference_engines": {
+      "items": {
+        "$ref": "#/$defs/InferenceEngineResponse"
+      },
+      "title": "Inference Engines",
+      "type": "array"
+    },
+    "observed_at": {
+      "format": "date-time",
+      "title": "Observed At",
+      "type": "string"
+    },
+    "platform": {
+      "$ref": "#/$defs/PlatformVersionResponse"
+    },
+    "summary": {
+      "$ref": "#/$defs/ComponentSummaryResponse"
+    }
+  },
+  "required": [
+    "observed_at",
+    "platform",
+    "summary",
+    "components",
+    "host_environment",
+    "inference_engines"
+  ],
+  "title": "SystemComponentsResponse",
+  "type": "object"
+}

@@ -1,0 +1,59 @@
+{
+  "$defs": {
+    "DownloadDisposition": {
+      "enum": [
+        "created",
+        "joined_existing"
+      ],
+      "type": "string"
+    },
+    "DownloadTaskStatus": {
+      "description": "Download Task lifecycle states.",
+      "enum": [
+        "Queued",
+        "Resolving",
+        "Downloading",
+        "Paused",
+        "Verifying",
+        "Publishing",
+        "Completed",
+        "Failed",
+        "Cancelled"
+      ],
+      "title": "DownloadTaskStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "disposition": {
+      "$ref": "#/$defs/DownloadDisposition"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "model_id": {
+      "format": "uuid",
+      "title": "Model Id",
+      "type": "string"
+    },
+    "replayed": {
+      "title": "Replayed",
+      "type": "boolean"
+    },
+    "status": {
+      "$ref": "#/$defs/DownloadTaskStatus"
+    }
+  },
+  "required": [
+    "id",
+    "model_id",
+    "status",
+    "replayed",
+    "disposition"
+  ],
+  "title": "DownloadCreatedResponse",
+  "type": "object"
+}

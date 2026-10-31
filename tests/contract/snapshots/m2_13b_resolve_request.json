@@ -1,0 +1,68 @@
+{
+  "$defs": {
+    "ModelOriginType": {
+      "description": "Complete Model source vocabulary.",
+      "enum": [
+        "Hugging Face",
+        "ModelScope",
+        "Local Path"
+      ],
+      "title": "ModelOriginType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Closed request Schema: no address-like field and no Glob field exists.",
+  "properties": {
+    "external_path": {
+      "anyOf": [
+        {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "External Path"
+    },
+    "repository_id": {
+      "anyOf": [
+        {
+          "maxLength": 200,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Repository Id"
+    },
+    "revision": {
+      "anyOf": [
+        {
+          "maxLength": 256,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Revision"
+    },
+    "source": {
+      "$ref": "#/$defs/ModelOriginType"
+    }
+  },
+  "required": [
+    "source"
+  ],
+  "title": "ResolveRequest",
+  "type": "object"
+}

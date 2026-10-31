@@ -1,0 +1,30 @@
+HTTP/2 302 
+content-type: text/plain; charset=utf-8
+content-length: 1054
+location: https://us.aws.cdn.hf.co/xet-bridge-us/66e81cbcd683a3f4e5291bbf/ddfa1ff25e39c57076e10f1a8b02cc96888ce69b0717f0d296c57b842695c965?<signed-query-redacted>
+date: Thu, 03 Sep 2026 06:14:07 GMT
+x-powered-by: huggingface-moon
+x-request-id: Root=1-6a99102f-4603416260d1fd362b7b2860
+ratelimit: "resolvers";r=2999;t=295
+ratelimit-policy: "fixed window";"resolvers";q=3000;w=300
+cross-origin-opener-policy: same-origin
+referrer-policy: strict-origin-when-cross-origin
+access-control-max-age: 86400
+access-control-allow-origin: https://huggingface.co
+vary: Origin, Accept
+access-control-expose-headers: X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash
+x-repo-commit: a09a35458c702b33eeacc393d103063234e8bc28
+accept-ranges: bytes
+x-hf-warning: unauthenticated; Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+x-hub-cache: MISS
+x-linked-size: 3945441440
+x-linked-etag: "a1333e6293854747c481288ea83b348226af178dd565c49b6f9495ba1966aba7"
+cache-control: no-store
+x-xet-hash: ddfa1ff25e39c57076e10f1a8b02cc96888ce69b0717f0d296c57b842695c965
+link: <https://huggingface.co/api/models/Qwen/Qwen2.5-7B-Instruct/xet-read-token/a09a35458c702b33eeacc393d103063234e8bc28>; rel="xet-auth", <https://cas-server.xethub.hf.co/v1/reconstructions/ddfa1ff25e39c57076e10f1a8b02cc96888ce69b0717f0d296c57b842695c965>; rel="xet-reconstruction-info"
+x-cache: Miss from cloudfront
+via: 1.1 b5afed9af6ab9ac8245e8872d677a7bc.cloudfront.net (CloudFront)
+x-amz-cf-pop: LAX53-P4
+alt-svc: h3=":443"; ma=86400
+x-amz-cf-id: VR0H9DHj3-gvsLC9IZevaiRH-mzsWnuQSZMBTyuqnzwJZ_hUe2mufQ==
+strict-transport-security: max-age=31536000

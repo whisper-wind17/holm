@@ -1,0 +1,77 @@
+# Python
+.venv/
+.uv-cache/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+.coverage.*
+htmlcov/
+/build/
+dist/
+*.egg-info/
+
+# Node / frontend
+node_modules/
+.pnpm-store/
+apps/web/dist/
+apps/web/.vite/
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+.secrets/
+.claude/settings.local.json
+
+# Runtime and persistent data
+data/
+models/
+tokenizers/
+runtime-cache/
+spool/
+backups/
+logs/
+*.sqlite
+*.sqlite3
+*.sqlite3-*
+*.db
+
+# Model weights must never be versioned
+*.safetensors
+*.gguf
+*.pt
+*.pth
+*.onnx
+
+# Large/generated test artifacts
+artifacts/
+tmp/
+.tmp/
+.codex-log/
+.impeccable/
+
+# 远端执行环境（含主机名/路径等本机环境信息，不进版本库）
+scripts/remote.env
+.devhome/
+.remote-manifest
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+.gstack/

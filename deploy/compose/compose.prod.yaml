@@ -1,0 +1,471 @@
+# Production topology for application processes. This remains JSON-shaped YAML so the
+# dependency-free static validator can fail closed without adding a YAML parser.
+# Host Agent and dynamic runtime-* containers are deliberately not Compose services.
+{
+  "name": "holm",
+  "services": {
+    "edge": {
+      "image": "holm/edge:0.1.0",
+      "user": "10001:10001",
+      "read_only": true,
+      "cap_drop": ["ALL"],
+      "security_opt": ["no-new-privileges:true"],
+      "tmpfs": ["/tmp:rw,noexec,nosuid,nodev,size=64m,uid=10001,gid=10001"],
+      "ports": ["80:8080", "443:8443"],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${HOLM_CONFIG_ROOT:-./config}/Caddyfile",
+          "target": "/etc/caddy/Caddyfile",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${HOLM_DATA_ROOT:-./data}/caddy/data",
+          "target": "/data",
+          "read_only": false
+        },
+        {
+          "type": "bind",
+          "source": "${HOLM_DATA_ROOT:-./data}/caddy/config",
+          "target": "/config",
+          "read_only": false
+        },
+        {
+          "type": "bind",
+          "source": "${HOLM_DATA_ROOT:-./data}/caddy/tls",
+          "target": "/etc/caddy/tls",
+          "read_only": true
+        }
+      ],
+      "networks": ["holm-app"],
+      "healthcheck": {
+        "test": ["CMD", "caddy", "version"],
+        "interval": "10s",
+        "timeout": "3s",
+        "retries": 6,
+        "start_period": "10s"
+      },
+      "restart": "unless-stopped"
+    },
+    "postgres": {
+      "image": "holm/postgres:16.15-alpine",
+      "user": "70:70",
+      "read_only": true,
+      "cap_drop": ["ALL"],
+      "security_opt": ["no-new-privileges:true"],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,nodev,size=64m,uid=70,gid=70",
+        "/var/run/postgresql:rw,noexec,nosuid,nodev,size=16m,uid=70,gid=70"
+      ],
+      "environment": {
+        "POSTGRES_DB": "holm",
+        "POSTGRES_USER": "holm_bootstrap",
+        "POSTGRES_PASSWORD_FILE": "/run/secrets/postgres_password",
+        "PGDATA": "/var/lib/postgresql/data/pgdata"
+      },
+      "secrets": ["postgres_password"],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${HOLM_DATA_ROOT:-./data}/postgres",
+          "target": "/var/lib/postgresql/data",
+          "read_only": false
+        }
+      ],
+      "networks": ["holm-app"],
+      "healthcheck": {
+        "test": ["CMD-SHELL", "pg_isready -U holm_bootstrap -d holm"],
+        "interval": "5s",
+        "timeout": "5s",
+        "retries": 12,
+        "start_period": "10s"
+      },
+      "restart": "unless-stopped"
+    },
+    "migrate": {
+      "image": "holm/application:0.1.0",
+      "user": "10002:10002",
+      "read_only": true,
+      "cap_drop": ["ALL"],
+      "security_opt": ["no-new-privileges:true"],
+      "tmpfs": ["/tmp:rw,noexec,nosuid,nodev,size=64m,uid=10002,gid=10002"],
+      "command": [
+        "python", "-c",
+        "from pathlib import Path; from sqlalchemy import create_engine; from holm_persistence import upgrade_to_head; engine=create_engine(Path('/run/secrets/migrate_database_url').read_text(encoding='utf-8').strip()); connection=engine.connect(); upgrade_to_head(connection, Path('/opt/holm/migrations/alembic.ini')); connection.close(); engine.dispose()"
+      ],
+      "secrets": ["migrate_database_url"],
+      "networks": ["holm-app"],
+      "depends_on": {
+        "postgres": {"condition": "service_healthy"}
+      },
+      "restart": "no"
+    },
+    "control-api": {
+      "image": "holm/application:0.1.0",
+      "user": "10003:10003",
+      "group_add": ["10009"],
+      "read_only": true,
+      "cap_drop": ["ALL"],
+      "security_opt": ["no-new-privileges:true"],
+      "tmpfs": ["/tmp:rw,noexec,nosuid,nodev,size=64m,uid=10003,gid=10003"],
+      "command": [
+        "python", "-m", "holm_control_api",
+        "--config", "/etc/holm/platform.yaml",
+        "--database-url-file", "/run/secrets/control_database_url",
+        "--master-keyring-file", "/run/secrets/master_keyring",
+        "--api-key-pepper-keyring-file", "/run/secrets/api_key_pepper_keyring",
+        "--idempotency-hmac-secret-file", "/run/secrets/idempotency_hmac_secret",
+        "--agent-socket", "/run/holm/agent.sock",
+        "--gateway-health-url", "http://gateway:8001",
+        "--edge-health-url", "http://edge:8081",
+        "--host", "0.0.0.0", "--port", "8000"
+      ],
+      "secrets": [
+        "control_database_url", "master_keyring", "api_key_pepper_keyring",
+        "idempotency_hmac_secret"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${HOLM_EXTERNAL_MODEL_ROOT:-/var/lib/holm/external-models}",
+          "target": "${HOLM_EXTERNAL_MODEL_ROOT:-/var/lib/holm/external-models}",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${HOLM_CONFIG_ROOT:-./config}/platform.yaml",
+          "target": "/etc/holm/platform.yaml",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/run/holm",
+          "target": "/run/holm",
+          "read_only": true
+        }
+      ],
+      "networks": ["holm-app", "holm-runtime"],
+      "depends_on": {
+        "postgres": {"condition": "service_healthy"},
+        "migrate": {"condition": "service_completed_successfully"}
+      },
+      "healthcheck": {
+        "test": [
+          "CMD", "holm-healthcheck", "http",
+          "http://127.0.0.1:8000/internal/health/ready"
+        ],
+        "interval": "5s",
+        "timeout": "3s",
+        "retries": 12,
+        "start_period": "10s"
+      },
+      "restart": "unless-stopped"
+    },
+    "gateway": {
+      "image": "holm/application:0.1.0",
+      "user": "10004:10004",
+      "read_only": true,
+      "cap_drop": ["ALL"],
+      "security_opt": ["no-new-privileges:true"],
+      "tmpfs": ["/tmp:rw,noexec,nosuid,nodev,size=64m,uid=10004,gid=10004"],
+      "command": [
+        "holm-gateway",
+        "--database-url-file", "/run/secrets/gateway_database_url",
+        "--api-key-pepper-keyring-file", "/run/secrets/api_key_pepper_keyring",
+        "--runtime-compatibility", "/opt/holm/runtime-compat.yaml",
+        "--request-ledger-path", "/var/lib/holm/spool/request-ledger.sqlite3",
+        "--host", "0.0.0.0", "--port", "8001"
+      ],
+      "secrets": [
+        "gateway_database_url",
+        {"source": "gateway_api_key_pepper_keyring", "target": "api_key_pepper_keyring"}
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${HOLM_DATA_ROOT:-./data}/spool",
+          "target": "/var/lib/holm/spool",
+          "read_only": false
+        },
+        {
+          "type": "bind",
+          "source": "${HOLM_DATA_ROOT:-./data}/tokenizers",
+          "target": "/var/lib/holm/tokenizers",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${HOLM_CONFIG_ROOT:-./config}/platform.yaml",
+          "target": "/etc/holm/platform.yaml",
+          "read_only": true
+        }
+      ],
+      "networks": ["holm-app", "holm-runtime"],
+      "depends_on": {
+        "postgres": {"condition": "service_healthy"},
+        "migrate": {"condition": "service_completed_successfully"}
+      },
+      "healthcheck": {
+        "test": ["CMD", "holm-healthcheck", "http", "http://127.0.0.1:8001/internal/health/live"],
+        "interval": "5s",
+        "timeout": "3s",
+        "retries": 12,
+        "start_period": "10s"
+      },
+      "restart": "unless-stopped"
+    },
+    "download-worker": {
+      "image": "holm/application:0.1.0",
+      "user": "10005:10003",
+      "group_add": ["10009"],
+      "read_only": true,
+      "cap_drop": ["ALL"],
+      "security_opt": ["no-new-privileges:true"],
+      "tmpfs": ["/tmp:rw,noexec,nosuid,nodev,size=256m,uid=10005,gid=10003"],
+      "command": [
+        "holm-download-worker",
+        "--database-url-file", "/run/secrets/download_database_url",
+        "--master-keyring-file", "/run/secrets/master_keyring",
+        "--instance-id", "download-worker-1",
+        "--build-version", "0.1.0",
+        "--model-root", "/var/lib/holm/models",
+        "--tokenizer-root", "/var/lib/holm/tokenizers",
+        "--agent-socket", "/run/holm/agent.sock",
+        "--external-model-root", "${HOLM_EXTERNAL_MODEL_ROOT:-/var/lib/holm/external-models}"
+      ],
+      "secrets": ["download_database_url", "master_keyring", "model_source_credentials"],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${HOLM_DATA_ROOT:-./data}/models",
+          "target": "/var/lib/holm/models",
+          "read_only": false
+        },
+        {
+          "type": "bind",
+          "source": "${HOLM_DATA_ROOT:-./data}/tokenizers",
+          "target": "/var/lib/holm/tokenizers",
+          "read_only": false
+        },
+        {
+          "type": "bind",
+          "source": "${HOLM_EXTERNAL_MODEL_ROOT:-/var/lib/holm/external-models}",
+          "target": "${HOLM_EXTERNAL_MODEL_ROOT:-/var/lib/holm/external-models}",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${HOLM_CONFIG_ROOT:-./config}/platform.yaml",
+          "target": "/etc/holm/platform.yaml",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/run/holm",
+          "target": "/run/holm",
+          "read_only": true
+        }
+      ],
+      "networks": ["holm-app"],
+      "depends_on": {
+        "postgres": {"condition": "service_healthy"},
+        "migrate": {"condition": "service_completed_successfully"}
+      },
+      "healthcheck": {
+        "test": [
+          "CMD", "holm-healthcheck", "heartbeat",
+          "--database-url-file", "/run/secrets/download_database_url",
+          "--component", "download-worker", "--instance-id", "download-worker-1",
+          "--require-socket", "/run/holm/agent.sock"
+        ],
+        "interval": "10s",
+        "timeout": "5s",
+        "retries": 6,
+        "start_period": "30s"
+      },
+      "restart": "unless-stopped"
+    },
+    "instance-controller": {
+      "image": "holm/application:0.1.0",
+      "user": "10006:10006",
+      "group_add": ["10009"],
+      "read_only": true,
+      "cap_drop": ["ALL"],
+      "security_opt": ["no-new-privileges:true"],
+      "tmpfs": ["/tmp:rw,noexec,nosuid,nodev,size=64m,uid=10006,gid=10006"],
+      "command": [
+        "holm-instance-controller",
+        "--database-url-file", "/run/secrets/instance_database_url",
+        "--agent-socket", "/run/holm/agent.sock",
+        "--runtime-compatibility", "/opt/holm/runtime-compat.yaml",
+        "--release-manifest", "/etc/holm/release-manifest.json"
+      ],
+      "secrets": ["instance_database_url"],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${HOLM_CONFIG_ROOT:-./config}/release-manifest.json",
+          "target": "/etc/holm/release-manifest.json",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${HOLM_CONFIG_ROOT:-./config}/platform.yaml",
+          "target": "/etc/holm/platform.yaml",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/run/holm",
+          "target": "/run/holm",
+          "read_only": true
+        }
+      ],
+      "networks": ["holm-app", "holm-runtime"],
+      "depends_on": {
+        "postgres": {"condition": "service_healthy"},
+        "migrate": {"condition": "service_completed_successfully"}
+      },
+      "healthcheck": {
+        "test": [
+          "CMD", "holm-healthcheck", "heartbeat",
+          "--database-url-file", "/run/secrets/instance_database_url",
+          "--component", "instance-controller", "--instance-id", "instance-controller",
+          "--require-socket", "/run/holm/agent.sock"
+        ],
+        "interval": "10s",
+        "timeout": "5s",
+        "retries": 6,
+        "start_period": "90s"
+      },
+      "restart": "unless-stopped"
+    },
+    "ledger-writer": {
+      "image": "holm/application:0.1.0",
+      "user": "10004:10004",
+      "read_only": true,
+      "cap_drop": ["ALL"],
+      "security_opt": ["no-new-privileges:true"],
+      "tmpfs": ["/tmp:rw,noexec,nosuid,nodev,size=64m,uid=10004,gid=10004"],
+      "command": [
+        "holm-ledger-writer",
+        "--database-url-file", "/run/secrets/ledger_database_url",
+        "--request-ledger-path", "/var/lib/holm/spool/request-ledger.sqlite3",
+        "--release-manifest", "/etc/holm/release-manifest.json",
+        "--instance-id", "ledger-writer-1", "--build-version", "0.1.0"
+      ],
+      "secrets": ["ledger_database_url"],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${HOLM_DATA_ROOT:-./data}/spool",
+          "target": "/var/lib/holm/spool",
+          "read_only": false
+        },
+        {
+          "type": "bind",
+          "source": "${HOLM_CONFIG_ROOT:-./config}/release-manifest.json",
+          "target": "/etc/holm/release-manifest.json",
+          "read_only": true
+        }
+      ],
+      "networks": ["holm-app"],
+      "depends_on": {
+        "postgres": {"condition": "service_healthy"},
+        "migrate": {"condition": "service_completed_successfully"}
+      },
+      "healthcheck": {
+        "test": [
+          "CMD", "holm-healthcheck", "heartbeat",
+          "--database-url-file", "/run/secrets/ledger_database_url",
+          "--component", "ledger-writer", "--instance-id", "ledger-writer-1"
+        ],
+        "interval": "10s",
+        "timeout": "5s",
+        "retries": 6,
+        "start_period": "30s"
+      },
+      "restart": "unless-stopped"
+    },
+    "maintenance-worker": {
+      "image": "holm/application:0.1.0",
+      "user": "10007:10007",
+      "read_only": true,
+      "cap_drop": ["ALL"],
+      "security_opt": ["no-new-privileges:true"],
+      "tmpfs": ["/tmp:rw,noexec,nosuid,nodev,size=64m,uid=10007,gid=10007"],
+      "command": [
+        "holm-maintenance-worker",
+        "--database-url-file", "/run/secrets/maintenance_database_url",
+        "--backup-root", "/var/lib/holm/backups",
+        "--model-root", "/var/lib/holm/models",
+        "--external-model-root", "${HOLM_EXTERNAL_MODEL_ROOT:-/var/lib/holm/external-models}",
+        "--instance-id", "maintenance-worker-1", "--build-version", "0.1.0"
+      ],
+      "secrets": ["maintenance_database_url"],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${HOLM_DATA_ROOT:-./data}/backups",
+          "target": "/var/lib/holm/backups",
+          "read_only": false
+        },
+        {
+          "type": "bind",
+          "source": "${HOLM_DATA_ROOT:-./data}/models",
+          "target": "/var/lib/holm/models",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${HOLM_EXTERNAL_MODEL_ROOT:-/var/lib/holm/external-models}",
+          "target": "${HOLM_EXTERNAL_MODEL_ROOT:-/var/lib/holm/external-models}",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${HOLM_CONFIG_ROOT:-./config}/platform.yaml",
+          "target": "/etc/holm/platform.yaml",
+          "read_only": true
+        }
+      ],
+      "networks": ["holm-app"],
+      "depends_on": {
+        "postgres": {"condition": "service_healthy"},
+        "migrate": {"condition": "service_completed_successfully"}
+      },
+      "healthcheck": {
+        "test": [
+          "CMD", "holm-healthcheck", "heartbeat",
+          "--database-url-file", "/run/secrets/maintenance_database_url",
+          "--component", "maintenance-worker", "--instance-id", "maintenance-worker-1"
+        ],
+        "interval": "10s",
+        "timeout": "5s",
+        "retries": 6,
+        "start_period": "30s"
+      },
+      "restart": "unless-stopped"
+    }
+  },
+  "networks": {
+    "holm-app": {"driver": "bridge"},
+    "holm-runtime": {"driver": "bridge", "internal": true}
+  },
+  "secrets": {
+    "postgres_password": {"file": "${HOLM_SECRETS_ROOT:-./secrets}/postgres_password"},
+    "migrate_database_url": {"file": "${HOLM_SECRETS_ROOT:-./secrets}/migrate_database_url"},
+    "control_database_url": {"file": "${HOLM_SECRETS_ROOT:-./secrets}/control_database_url"},
+    "gateway_database_url": {"file": "${HOLM_SECRETS_ROOT:-./secrets}/gateway_database_url"},
+    "download_database_url": {"file": "${HOLM_SECRETS_ROOT:-./secrets}/download_database_url"},
+    "instance_database_url": {"file": "${HOLM_SECRETS_ROOT:-./secrets}/instance_database_url"},
+    "ledger_database_url": {"file": "${HOLM_SECRETS_ROOT:-./secrets}/ledger_database_url"},
+    "maintenance_database_url": {"file": "${HOLM_SECRETS_ROOT:-./secrets}/maintenance_database_url"},
+    "master_keyring": {"file": "${HOLM_SECRETS_ROOT:-./secrets}/master_keyring"},
+    "api_key_pepper_keyring": {"file": "${HOLM_SECRETS_ROOT:-./secrets}/api_key_pepper_keyring"},
+    "gateway_api_key_pepper_keyring": {"file": "${HOLM_SECRETS_ROOT:-./secrets}/gateway_api_key_pepper_keyring"},
+    "idempotency_hmac_secret": {"file": "${HOLM_SECRETS_ROOT:-./secrets}/idempotency_hmac_secret"},
+    "model_source_credentials": {"file": "${HOLM_SECRETS_ROOT:-./secrets}/model_source_credentials"}
+  }
+}

@@ -1,0 +1,20 @@
+[project]
+name = "holm-contracts"
+version = "0.1.0rc1"
+description = "Pydantic and OpenAPI contracts for Private AI Workspace"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "grpcio==1.83.1",
+  "holm-common==0.1.0rc1",
+  "holm-domain==0.1.0rc1",
+  "protobuf==7.36.0",
+  "pydantic==2.13.4",
+]
+
+[tool.uv.sources]
+holm-common = { workspace = true }
+holm-domain = { workspace = true }
+
+[build-system]
+requires = ["uv_build==0.11.7"]
+build-backend = "uv_build"

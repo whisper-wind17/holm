@@ -1,0 +1,28 @@
+{
+  "LocalAvailability": [
+    "artifact_ready",
+    "download_active",
+    "absent"
+  ],
+  "MetadataKnowledgeState": [
+    "identified",
+    "unrecognized"
+  ],
+  "MetadataStatus": [
+    "CONFIRMED",
+    "UNCONFIRMED"
+  ],
+  "ResolveConclusion": [
+    "resolved",
+    "external_path_accepted",
+    "unresolved"
+  ],
+  "RevisionImmutability": [
+    "immutable",
+    "mutable_reference"
+  ],
+  "disposition": [
+    "created",
+    "joined_existing"
+  ]
+}

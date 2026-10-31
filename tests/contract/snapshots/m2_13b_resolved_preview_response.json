@@ -1,0 +1,341 @@
+{
+  "$defs": {
+    "DeployableLayout": {
+      "enum": [
+        "supported",
+        "unsupported",
+        "unknown"
+      ],
+      "title": "DeployableLayout",
+      "type": "string"
+    },
+    "IdentifiedValue_int_": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "const": "identified",
+          "default": "identified",
+          "title": "State",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "IdentifiedValue[int]",
+      "type": "object"
+    },
+    "IdentifiedValue_str_": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "const": "identified",
+          "default": "identified",
+          "title": "State",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "IdentifiedValue[str]",
+      "type": "object"
+    },
+    "IdentifiedValue_tuple_RemoteFileResponse__________": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "const": "identified",
+          "default": "identified",
+          "title": "State",
+          "type": "string"
+        },
+        "value": {
+          "items": {
+            "$ref": "#/$defs/RemoteFileResponse"
+          },
+          "title": "Value",
+          "type": "array"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "IdentifiedValue[tuple[RemoteFileResponse, ...]]",
+      "type": "object"
+    },
+    "IdentifiedValue_tuple_str__________": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "const": "identified",
+          "default": "identified",
+          "title": "State",
+          "type": "string"
+        },
+        "value": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Value",
+          "type": "array"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "IdentifiedValue[tuple[str, ...]]",
+      "type": "object"
+    },
+    "LocalAvailability": {
+      "description": "Whether the same version exists locally, as three distinguishable answers.\n\n``ABSENT`` is a conclusion the platform reached, not an omitted field: the\nwizard must be able to tell \"no local copy\" from \"nobody looked\".",
+      "enum": [
+        "artifact_ready",
+        "download_active",
+        "absent"
+      ],
+      "title": "LocalAvailability",
+      "type": "string"
+    },
+    "ModelOriginType": {
+      "description": "Complete Model source vocabulary.",
+      "enum": [
+        "Hugging Face",
+        "ModelScope",
+        "Local Path"
+      ],
+      "title": "ModelOriginType",
+      "type": "string"
+    },
+    "RemoteFileResponse": {
+      "additionalProperties": false,
+      "description": "One entry of the remote file listing.\n\n``content_sha256`` is the per-file content hash and carries its own\nknowledge state: for a mutable-reference source it is what makes the\npreview reproducible at all, and for a source that states none the field\nsays \"unrecognized\" rather than rendering an empty hash.",
+      "properties": {
+        "content_sha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IdentifiedValue_str_"
+            },
+            {
+              "$ref": "#/$defs/UnrecognizedValue"
+            }
+          ],
+          "title": "Content Sha256"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "size_bytes": {
+          "title": "Size Bytes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "path",
+        "size_bytes",
+        "content_sha256"
+      ],
+      "title": "RemoteFileResponse",
+      "type": "object"
+    },
+    "ResolvedModelResponse": {
+      "additionalProperties": false,
+      "description": "Resolved model metadata, with a knowledge state on every optional field.",
+      "properties": {
+        "architecture": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IdentifiedValue_str_"
+            },
+            {
+              "$ref": "#/$defs/UnrecognizedValue"
+            }
+          ],
+          "title": "Architecture"
+        },
+        "candidate_runtimes": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IdentifiedValue_tuple_str__________"
+            },
+            {
+              "$ref": "#/$defs/UnrecognizedValue"
+            }
+          ],
+          "title": "Candidate Runtimes"
+        },
+        "context_length": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IdentifiedValue_int_"
+            },
+            {
+              "$ref": "#/$defs/UnrecognizedValue"
+            }
+          ],
+          "title": "Context Length"
+        },
+        "files": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IdentifiedValue_tuple_RemoteFileResponse__________"
+            },
+            {
+              "$ref": "#/$defs/UnrecognizedValue"
+            }
+          ],
+          "title": "Files"
+        },
+        "license": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IdentifiedValue_str_"
+            },
+            {
+              "$ref": "#/$defs/UnrecognizedValue"
+            }
+          ],
+          "title": "License"
+        },
+        "modalities": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IdentifiedValue_tuple_str__________"
+            },
+            {
+              "$ref": "#/$defs/UnrecognizedValue"
+            }
+          ],
+          "title": "Modalities"
+        },
+        "precision": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IdentifiedValue_str_"
+            },
+            {
+              "$ref": "#/$defs/UnrecognizedValue"
+            }
+          ],
+          "title": "Precision"
+        },
+        "quantization": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IdentifiedValue_str_"
+            },
+            {
+              "$ref": "#/$defs/UnrecognizedValue"
+            }
+          ],
+          "title": "Quantization"
+        },
+        "repository_id": {
+          "title": "Repository Id",
+          "type": "string"
+        },
+        "requested_revision_norm": {
+          "title": "Requested Revision Norm",
+          "type": "string"
+        },
+        "resolved_revision": {
+          "title": "Resolved Revision",
+          "type": "string"
+        },
+        "revision_immutability": {
+          "$ref": "#/$defs/RevisionImmutability"
+        },
+        "source": {
+          "$ref": "#/$defs/ModelOriginType"
+        },
+        "total_size_bytes": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IdentifiedValue_int_"
+            },
+            {
+              "$ref": "#/$defs/UnrecognizedValue"
+            }
+          ],
+          "title": "Total Size Bytes"
+        }
+      },
+      "required": [
+        "source",
+        "repository_id",
+        "requested_revision_norm",
+        "resolved_revision",
+        "revision_immutability",
+        "files",
+        "total_size_bytes",
+        "architecture",
+        "modalities",
+        "precision",
+        "quantization",
+        "context_length",
+        "candidate_runtimes",
+        "license"
+      ],
+      "title": "ResolvedModelResponse",
+      "type": "object"
+    },
+    "RevisionImmutability": {
+      "description": "Whether a resolved Revision is an immutable reference.\n\nImmutability is a property of the *source*, not something the platform may\nassume.  Hugging Face resolves a Branch/Tag to a repository-level Commit;\nModelScope has none -- its ``/revisions`` lists only branches and tags, its\nmetadata ``Revision`` field is a branch name, and its file tree carries one\nlast-commit sha *per file*.  So the answer is stated on every preview\ninstead of inferred from the shape of the string, and a platform-minted\n\"pseudo Commit\" is never synthesized: such an identifier cannot be handed\nback to the source to get the same tree, so it looks like a reference\nwithout being usable as one.  For a mutable reference, reproducibility is\ncarried by the file listing snapshot plus each file's content hash.",
+      "enum": [
+        "immutable",
+        "mutable_reference"
+      ],
+      "title": "RevisionImmutability",
+      "type": "string"
+    },
+    "UnrecognizedValue": {
+      "additionalProperties": false,
+      "description": "A metadata field explicitly reported as \"\u672a\u8bc6\u522b\".\n\nIt has no ``value`` key at all, so the rendering cannot degrade into\n``null``, ``\"\"``, ``0``, ``false`` or a source default.",
+      "properties": {
+        "state": {
+          "const": "unrecognized",
+          "default": "unrecognized",
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "title": "UnrecognizedValue",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A preview the source confirmed, plus the local-copy answer.",
+  "properties": {
+    "deployable_layout": {
+      "$ref": "#/$defs/DeployableLayout"
+    },
+    "local_availability": {
+      "$ref": "#/$defs/LocalAvailability"
+    },
+    "outcome": {
+      "const": "resolved",
+      "default": "resolved",
+      "title": "Outcome",
+      "type": "string"
+    },
+    "resolved": {
+      "$ref": "#/$defs/ResolvedModelResponse"
+    }
+  },
+  "required": [
+    "resolved",
+    "local_availability",
+    "deployable_layout"
+  ],
+  "title": "ResolvedPreviewResponse",
+  "type": "object"
+}

@@ -1,0 +1,557 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+readonly WORKSPACE_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+cd "$WORKSPACE_ROOT"
+
+usage() {
+  cat <<'EOF'
+Usage: ./dev <command> [options]
+
+Commands:
+  bootstrap       Install locked Python and Node dependencies
+  build           Build deterministic Python wheels and Web bundle
+  verify-build    Verify cold-online and warm-offline build reproducibility
+  verify-clean-ci Bootstrap a pristine copy with empty caches and run every gate
+  fix             Apply deterministic, semantics-preserving source fixes
+  format          Format Python and TypeScript sources
+  format --check  Check formatting without changing files
+  lint            Run Python/TypeScript lint and dependency guards
+  typecheck       Run Python and TypeScript strict type checks
+  unit            Run backend and frontend unit tests
+  integration     Run integration tests against a real PostgreSQL cluster
+  perf            Run the frozen TC-PF-01 Gateway performance profile
+  fast-check      Run format check, lint, typecheck, and unit
+  ci              Run every implemented gate: fast-check plus integration
+  install-hooks   Point core.hooksPath at .githooks so git runs ci automatically
+  install-hooks --uninstall
+                  Undo install-hooks
+
+Run dependency, build, and test commands inside the development container.
+install-hooks writes local git config and therefore runs on the machine that holds .git.
+EOF
+  if [[ ! -f .holm-public-export ]]; then
+    cat <<'EOF'
+  cert-download   Run the real-network download certification tier
+  preview         Start, inspect, stop, or reset the ENV-03 development preview
+  proto           Run the production-shaped prototype: up, down, status, smoke, reset
+EOF
+  fi
+}
+
+fail() {
+  printf 'ERROR: %s\n' "$1" >&2
+  exit "${2:-1}"
+}
+
+require_command() {
+  local command_name="$1"
+  local install_hint="$2"
+
+  command -v "$command_name" >/dev/null 2>&1 ||
+    fail "required command '$command_name' was not found; $install_hint" 127
+}
+
+run_step() {
+  local label="$1"
+  shift
+
+  printf '==> %s\n' "$label"
+  "$@" || {
+    local status=$?
+    printf 'ERROR: %s failed with exit code %d\n' "$label" "$status" >&2
+    return "$status"
+  }
+}
+
+check_prerequisites() {
+  require_command "uv" "install uv 0.11 or newer from https://docs.astral.sh/uv/"
+  require_command "node" "install a Node version allowed by the root package.json engines field"
+  require_command "npm" "install npm with Node and satisfy the root package.json engines field"
+
+  run_step "Check uv" uv --version
+  run_step "Check Node version" node -e '
+    const [major, minor] = process.versions.node.split(".").map(Number);
+    const supported = (major === 22 && minor >= 13) || major === 24;
+    if (!supported) {
+      console.error(`ERROR: Node ${process.versions.node} is unsupported; expected ^22.13.0 or >=24 <25`);
+      process.exit(2);
+    }
+  '
+  run_step "Check npm version" npm --version
+}
+
+check_reproducible_toolchain() {
+  local uv_version
+  local npm_version
+
+  uv_version="$(uv --version)"
+  npm_version="$(npm --version)"
+  [[ "$uv_version" == "uv 0.11.7 "* ]] ||
+    fail "reproducible build requires uv 0.11.7; found '$uv_version'" 2
+  [[ "$npm_version" == "11.9.0" ]] ||
+    fail "reproducible build requires npm 11.9.0; found '$npm_version'" 2
+}
+
+bootstrap() {
+  check_prerequisites
+  run_step "Sync locked Python workspace" uv sync --frozen --all-packages
+  run_step "Cache hash-locked Python build backend" \
+    uv run --frozen python scripts/cache_build_dependencies.py
+  run_step "Install locked Node workspace" npm ci
+}
+
+build_artifacts() {
+  check_prerequisites
+  check_reproducible_toolchain
+  run_step "Build deterministic artifacts" \
+    uv run --frozen python scripts/build_artifacts.py
+}
+
+verify_build() {
+  check_prerequisites
+  check_reproducible_toolchain
+  run_step "Verify reproducible build" \
+    uv run --frozen python scripts/verify_reproducible_build.py
+}
+
+# The gate list also names an image scan and a
+# dependency scan. Neither can be executed truthfully today, and a gate that
+# always passes is worse than an absent one: it makes people believe coverage
+# exists. So `ci` states their absence out loud instead, every run. The cleanup
+# conditions are: supply real scanners and advisory data.
+declare_unimplemented_gates() {
+  # stdout, not stderr: over ssh the two streams interleave unpredictably, and a
+  # notice that lands in the middle of the gate output reads like a gate result.
+  cat <<'EOF'
+==> NOT IMPLEMENTED — two gates are absent, not passing
+    image scan       there is no platform Dockerfile or self-built image to scan;
+                     Compose references pinned upstream images only.
+    dependency scan  no scanner or advisory database is available inside the
+                     repository, and adding one means adding a dependency.
+    Neither gate runs below. They require real scanners and advisory data.
+EOF
+}
+
+format_sources() {
+  local mode="${1:-write}"
+
+  if [[ "$mode" == "check" ]]; then
+    run_step "Check Python formatting" uv run --frozen ruff format --check apps packages scripts tests
+    run_step "Check TypeScript formatting" npm run format:check --workspace @holm/web
+    return
+  fi
+
+  run_step "Format Python sources" uv run --frozen ruff format apps packages scripts tests
+  run_step "Format TypeScript sources" npm run format --workspace @holm/web
+}
+
+fix_sources() {
+  local status=0
+
+  # Ruff applies only fixes it classifies as safe unless --unsafe-fixes is
+  # explicitly present. Keep that option absent: this command is mechanical,
+  # not a way to approve semantic rewrites.
+  run_step "Apply safe Python lint fixes" \
+    uv run --frozen ruff check --fix apps packages scripts tests || status=$?
+  run_step "Format Python sources" \
+    uv run --frozen ruff format apps packages scripts tests || status=$?
+  run_step "Apply TypeScript lint fixes" \
+    npm run lint --workspace @holm/web -- --fix || status=$?
+  run_step "Format TypeScript sources" \
+    npm run format --workspace @holm/web || status=$?
+
+  return "$status"
+}
+
+lint_sources() {
+  run_step "Lint Python sources" uv run --frozen ruff check apps packages scripts tests
+  run_step "Check dependency direction" uv run --frozen python scripts/check_dependencies.py
+  if [[ -f .holm-public-export && ! -e NEXT.md ]]; then
+    [[ "$(cat .holm-public-export)" == "holm-public-export-v1" ]] ||
+      fail "invalid public-export marker" 2
+    printf '==> SKIP Check document budgets: public export excludes NEXT.md\n'
+  else
+    run_step "Check document budgets" uv run --frozen python scripts/check_doc_budget.py
+  fi
+  run_step "Lint TypeScript sources" npm run lint --workspace @holm/web
+}
+
+typecheck_sources() {
+  local -a workspace_typecheck_sources=(
+    apps/control_api/src
+    apps/gateway/src
+    apps/host_agent/src
+    apps/workers/download/src
+    apps/workers/instance/src
+    apps/workers/ledger/src
+    apps/workers/maintenance/src
+    packages/common/src
+    packages/contracts/src
+    packages/domain/src
+    packages/ledger/src
+    packages/persistence/src
+    packages/protocols/src
+    packages/runtimes/src
+    packages/security/src
+    packages/telemetry/src
+  )
+  run_step "Check strict mypy workspace coverage" \
+    uv run --frozen python scripts/check_mypy_workspace_coverage.py \
+      "${workspace_typecheck_sources[@]}"
+  run_step "Typecheck Python sources" \
+    uv run --frozen mypy packages/common/src packages/contracts/src packages/domain/src \
+      packages/ledger/src packages/persistence/src packages/runtimes/src packages/security/src \
+      packages/telemetry/src \
+      apps/control_api/src scripts \
+      apps/host_agent/src apps/workers/download/src apps/workers/instance/src \
+      apps/workers/ledger/src apps/workers/maintenance/src \
+      tests/fixtures/stub_runtime \
+      tests/fixtures/fake_nvml tests/fixtures/fake_host_agent \
+      tests/fixtures/fake_model_source tests/fixtures/sqlite_ledger \
+      tests/integration
+  run_step "Typecheck all workspace member sources" \
+    uv run --frozen mypy "${workspace_typecheck_sources[@]}"
+  run_step "Typecheck TypeScript sources" npm run typecheck --workspace @holm/web
+}
+
+unit_tests() {
+  run_step "Run Python unit tests" \
+    uv run --frozen pytest tests/engineering tests/unit tests/property tests/contract tests/security \
+      tests/performance -m "not perf"
+  run_step "Run TypeScript unit tests" npm run test --workspace @holm/web
+}
+
+performance_tests() {
+  PYTHONPATH="$WORKSPACE_ROOT/tests${PYTHONPATH:+:$PYTHONPATH}" \
+    run_step "Run TC-PF-01 Gateway performance profile" \
+      uv run --frozen python -m performance.harness "$@"
+}
+
+# Integration tests own a real PostgreSQL cluster and are far slower than the
+# unit suites, so they stay out of fast-check and get their own subcommand.
+integration_tests() {
+  run_step "Run Python integration tests" uv run --frozen pytest tests/integration
+  run_step "Run Python fault tests" uv run --frozen pytest tests/fault
+}
+
+certify_downloads() {
+  local certification_root="${HOLM_CERTIFICATION_ROOT:-$WORKSPACE_ROOT/build/certification}"
+  mkdir -p "$certification_root"
+  HOLM_CERTIFICATION_ROOT="$certification_root" \
+    run_step "Run real-network download certification" \
+      uv run --frozen pytest tests/certification
+}
+
+preview() {
+  require_command "uv" "install uv 0.11 or newer from https://docs.astral.sh/uv/"
+  uv run --frozen python scripts/dev_preview.py "$@"
+}
+
+proto() {
+  require_command "uv" "install uv 0.11 or newer from https://docs.astral.sh/uv/"
+  local action="$1"
+  shift
+  case "$action" in
+    up)
+      [[ $# -eq 0 ]] || fail "proto up accepts no options; configure ports via HOLM_*" 2
+      HOLM_DEV_MODE=proto uv run --frozen python scripts/dev_preview.py start
+      ;;
+    down)
+      [[ $# -eq 0 ]] || fail "proto down accepts no options" 2
+      HOLM_DEV_MODE=proto uv run --frozen python scripts/dev_preview.py stop
+      ;;
+    status | reset)
+      [[ $# -eq 0 ]] || fail "proto $action accepts no options" 2
+      HOLM_DEV_MODE=proto uv run --frozen python scripts/dev_preview.py "$action"
+      ;;
+    smoke)
+      uv run --frozen python scripts/proto_smoke.py "$@"
+      ;;
+    *)
+      fail "proto requires one of: up, down, status, smoke, reset" 2
+      ;;
+  esac
+}
+
+fast_check() {
+  format_sources check
+  lint_sources
+  typecheck_sources
+  unit_tests
+}
+
+# The aggregate gate. errexit makes every helper above abort the script with the
+# failing step's own exit code, so a failure anywhere stops the rest.
+#
+# The unimplemented gates are announced first, not last: a failing gate aborts
+# the run, and a notice that only prints on success would be invisible exactly
+# when someone is reading the output most carefully.
+ci_gates() {
+  declare_unimplemented_gates
+  fast_check
+  integration_tests
+}
+
+# ---------------------------------------------------------------- clean run
+# Build verification has two halves. `verify-build` covers "cold and warm builds
+# agree"; this covers the other one: a pristine copy of the repository, with every
+# dependency cache empty, can bootstrap and pass every gate.
+#
+# It deliberately never touches this workspace's .venv/ or node_modules/. The
+# snapshot lives under TMPDIR and gets its own HOME, uv cache and npm cache, so
+# a wiped cache is simulated by never having one rather than by deleting one.
+
+# The EXIT trap fires after verify_clean_ci has returned, so the path it removes
+# cannot be one of that function's locals.
+CLEAN_CI_SNAPSHOT_ROOT=""
+
+remove_clean_ci_snapshot() {
+  [[ -n "$CLEAN_CI_SNAPSHOT_ROOT" ]] || return 0
+  rm -rf -- "$CLEAN_CI_SNAPSHOT_ROOT"
+}
+
+verify_clean_ci() {
+  require_command "git" "install git"
+  require_command "tar" "install tar"
+  check_prerequisites
+
+  CLEAN_CI_SNAPSHOT_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/holm-clean-ci-XXXXXXXX")"
+  trap remove_clean_ci_snapshot EXIT
+  local snapshot_root="$CLEAN_CI_SNAPSHOT_ROOT"
+
+  local workspace="$snapshot_root/workspace"
+  local isolated_home="$snapshot_root/home"
+  local uv_cache="$snapshot_root/cache/uv"
+  local npm_cache="$snapshot_root/cache/npm"
+  mkdir -p "$workspace" "$isolated_home"
+  # The PostgreSQL integration fixture drops privileges to uid 1000, and those
+  # processes inherit this directory as their working directory. mktemp's 0700
+  # would make it unreadable to them.
+  chmod 755 "$snapshot_root" "$workspace"
+
+  run_step "Snapshot tracked and untracked-but-not-ignored files" \
+    bash -c 'git ls-files --cached --others --exclude-standard -z \
+      | tar --null --files-from=- --create --file=- \
+      | tar --extract --file=- --directory="$1"' _ "$workspace"
+
+  local generated
+  for generated in ".venv" "node_modules" "build"; do
+    [[ ! -e "$workspace/$generated" ]] ||
+      fail "clean snapshot already contains '$generated'; it would not be a cold run" 1
+  done
+
+  # A fresh clone has a .git; several gates depend on it. The repository-hygiene
+  # checks in tests/engineering ask git which files are tracked and which paths
+  # are ignored, and without a repository they fail for the wrong reason. An index
+  # is enough for every one of them, so the snapshot is staged but never
+  # committed -- this stays clear of the "no git commit on the execution side"
+  # execution-side rule; nothing here is ever pushed or synced back.
+  run_step "Give the snapshot a git index (staged, never committed)" \
+    bash -c 'cd "$1" && git init --quiet && git add --all' _ "$workspace"
+
+  local -a clean_environment=(
+    "HOME=$isolated_home"
+    "UV_CACHE_DIR=$uv_cache"
+    "npm_config_cache=$npm_cache"
+  )
+
+  run_step "Clean snapshot: bootstrap with empty caches" \
+    env "${clean_environment[@]}" "$workspace/dev" bootstrap
+  run_step "Clean snapshot: build" \
+    env "${clean_environment[@]}" "$workspace/dev" build
+  run_step "Clean snapshot: ci" \
+    env "${clean_environment[@]}" "$workspace/dev" ci
+
+  # Prove the run really was cold and really was isolated, rather than having
+  # silently reused this workspace's dependencies.
+  local required
+  for required in "$workspace/.venv" "$workspace/node_modules" "$uv_cache" "$npm_cache"; do
+    [[ -d "$required" ]] ||
+      fail "clean run did not populate '$required'; the caches were not isolated" 1
+  done
+
+  printf '==> Clean snapshot passed bootstrap, build and every implemented gate\n'
+}
+
+# ---------------------------------------------------------------- git hooks
+# The hooks live in the repository so they are reviewable and travel with git.
+# core.hooksPath, however, is per-clone local git config, which is why enabling
+# them needs this explicit command.
+readonly HOOKS_DIR=".githooks"
+readonly MANAGED_HOOKS=("pre-push" "pre-merge-commit" "pre-commit")
+
+install_hooks() {
+  if [[ -f .holm-public-export && ! -d .githooks ]]; then
+    fail "install-hooks unavailable: public export excludes private remote hooks" 2
+  fi
+  require_command "git" "install git"
+  git rev-parse --show-toplevel >/dev/null 2>&1 ||
+    fail "install-hooks must run inside the git working tree that holds .git" 2
+
+  local hook
+  for hook in "${MANAGED_HOOKS[@]}" "lib/run-gate.sh"; do
+    [[ -f "$HOOKS_DIR/$hook" ]] || fail "missing hook script $HOOKS_DIR/$hook" 2
+    [[ -x "$HOOKS_DIR/$hook" ]] || chmod +x "$HOOKS_DIR/$hook"
+    [[ -x "$HOOKS_DIR/$hook" ]] ||
+      fail "$HOOKS_DIR/$hook is not executable; a filesystem that cannot express
+the executable bit (a 9p-mounted Windows drive) will silently disable the hooks" 1
+  done
+
+  git config core.hooksPath "$HOOKS_DIR"
+  # Fast-forward merges create no merge commit, so pre-merge-commit never fires
+  # for them. Without this, the gate would skip exactly the integration merges it
+  # exists to guard.
+  git config merge.ff false
+
+  cat <<'EOF'
+==> Enabled versioned git hooks
+    core.hooksPath = .githooks
+    merge.ff       = false      (fast-forward merges would skip pre-merge-commit)
+
+    pre-push           validates every pushed ref's candidate tree
+    pre-merge-commit   validates the candidate index tree before a merge commit
+    pre-commit         validates only when MERGE_HEAD exists (ordinary commits skip)
+
+    All delegate to the execution wrapper; a missing tree record runs ./dev ci.
+    The gate itself stays defined only in ./dev.
+
+    What this does NOT do:
+      * `git push --no-verify` and `git merge --no-verify` skip the hooks
+        entirely. git offers no way to forbid that. This catches forgetting to
+        run the gate; it does not stop a deliberate bypass.
+      * It is local git config. Every clone must run this command again.
+      * A dirty working tree is rejected. Passing records are keyed by git tree
+        id, so only byte-identical candidate trees can reuse a prior result.
+
+    Undo with: ./dev install-hooks --uninstall
+EOF
+}
+
+uninstall_hooks() {
+  if [[ -f .holm-public-export && ! -d .githooks ]]; then
+    fail "install-hooks unavailable: public export excludes private remote hooks" 2
+  fi
+  require_command "git" "install git"
+  git rev-parse --show-toplevel >/dev/null 2>&1 ||
+    fail "install-hooks must run inside the git working tree that holds .git" 2
+
+  # `git config --unset` exits 5 when the key is already absent, which errexit
+  # would turn into a failed uninstall.
+  git config --unset core.hooksPath || true
+  git config --unset merge.ff || true
+
+  printf '==> Disabled versioned git hooks (core.hooksPath and merge.ff unset)\n'
+  printf '    No gate now runs automatically. ./dev ci must be run by hand.\n'
+}
+
+main() {
+  local command_name="${1:-}"
+  shift || true
+
+  if [[ -f .holm-public-export ]]; then
+    case "$command_name" in
+      preview | proto | cert-download)
+        usage >&2
+        fail "unknown command '$command_name'" 2
+        ;;
+    esac
+  fi
+
+  case "$command_name" in
+    bootstrap)
+      [[ $# -eq 0 ]] || fail "bootstrap accepts no options" 2
+      bootstrap
+      ;;
+    build)
+      [[ $# -eq 0 ]] || fail "build accepts no options" 2
+      build_artifacts
+      ;;
+    verify-build)
+      [[ $# -eq 0 ]] || fail "verify-build accepts no options" 2
+      verify_build
+      ;;
+    verify-clean-ci)
+      [[ $# -eq 0 ]] || fail "verify-clean-ci accepts no options" 2
+      verify_clean_ci
+      ;;
+    fix)
+      [[ $# -eq 0 ]] || fail "fix accepts no options" 2
+      fix_sources
+      ;;
+    format)
+      if [[ $# -eq 0 ]]; then
+        format_sources
+      elif [[ $# -eq 1 && "$1" == "--check" ]]; then
+        format_sources check
+      else
+        fail "format accepts only the optional --check flag" 2
+      fi
+      ;;
+    lint)
+      [[ $# -eq 0 ]] || fail "lint accepts no options" 2
+      lint_sources
+      ;;
+    typecheck)
+      [[ $# -eq 0 ]] || fail "typecheck accepts no options" 2
+      typecheck_sources
+      ;;
+    unit)
+      [[ $# -eq 0 ]] || fail "unit accepts no options" 2
+      unit_tests
+      ;;
+    integration)
+      [[ $# -eq 0 ]] || fail "integration accepts no options" 2
+      integration_tests
+      ;;
+    perf)
+      performance_tests "$@"
+      ;;
+    cert-download)
+      [[ $# -eq 0 ]] || fail "cert-download accepts no options" 2
+      certify_downloads
+      ;;
+    preview)
+      [[ $# -eq 1 ]] || fail "preview requires one of: start, status, stop, reset" 2
+      case "$1" in
+        start | status | stop | reset) preview "$1" ;;
+        *) fail "preview requires one of: start, status, stop, reset" 2 ;;
+      esac
+      ;;
+    proto)
+      [[ $# -ge 1 ]] || fail "proto requires one of: up, down, status, smoke, reset" 2
+      proto "$@"
+      ;;
+    fast-check)
+      [[ $# -eq 0 ]] || fail "fast-check accepts no options" 2
+      fast_check
+      ;;
+    ci)
+      [[ $# -eq 0 ]] || fail "ci accepts no options" 2
+      ci_gates
+      ;;
+    install-hooks)
+      if [[ $# -eq 0 ]]; then
+        install_hooks
+      elif [[ $# -eq 1 && "$1" == "--uninstall" ]]; then
+        uninstall_hooks
+      else
+        fail "install-hooks accepts only the optional --uninstall flag" 2
+      fi
+      ;;
+    -h | --help | help)
+      usage
+      ;;
+    "")
+      usage >&2
+      exit 2
+      ;;
+    *)
+      usage >&2
+      fail "unknown command '$command_name'" 2
+      ;;
+  esac
+}
+
+main "$@"

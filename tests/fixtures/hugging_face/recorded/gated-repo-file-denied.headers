@@ -1,0 +1,24 @@
+HTTP/2 401 
+content-type: text/plain; charset=utf-8
+content-length: 140
+date: Thu, 03 Sep 2026 06:40:30 GMT
+etag: W/"8c-6WrD95JiXZalWmyM/8wvo3ELvyY"
+x-powered-by: huggingface-moon
+x-request-id: Root=1-6a99165e-400e33f6403541ea132a4125
+ratelimit: "resolvers";r=2999;t=212
+ratelimit-policy: "fixed window";"resolvers";q=3000;w=300
+cross-origin-opener-policy: same-origin
+referrer-policy: strict-origin-when-cross-origin
+access-control-max-age: 86400
+access-control-allow-origin: https://huggingface.co
+vary: Origin
+access-control-expose-headers: X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash
+x-error-code: GatedRepo
+x-error-message: Access to model meta-llama/Llama-3.1-8B-Instruct is restricted. You must have access to it and be authenticated to access it. Please log in.
+www-authenticate: Bearer realm="Authentication required", charset="UTF-8"
+x-cache: Error from cloudfront
+via: 1.1 e600f5483a3a38c376771d4d64daba24.cloudfront.net (CloudFront)
+x-amz-cf-pop: LAX53-P4
+alt-svc: h3=":443"; ma=86400
+x-amz-cf-id: sYuNXkHOmNgaA4o3XsAk5XHNE_5MIm9gCCG0cxrEqjiGxevm7NLIqw==
+strict-transport-security: max-age=31536000

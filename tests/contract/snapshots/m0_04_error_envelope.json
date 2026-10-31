@@ -1,0 +1,92 @@
+{
+  "components": {
+    "schemas": {
+      "ErrorBody": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/ErrorCode"
+          },
+          "details": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Details",
+            "type": "object"
+          },
+          "message": {
+            "minLength": 1,
+            "title": "Message",
+            "type": "string"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "details",
+          "request_id"
+        ],
+        "title": "ErrorBody",
+        "type": "object"
+      },
+      "ErrorCode": {
+        "enum": [
+          "invalid_request",
+          "invalid_tensor_parallel_size",
+          "unsupported_gpu_topology",
+          "remote_code_not_allowed",
+          "invalid_api_key",
+          "api_key_expired",
+          "service_not_authorized",
+          "model_not_found",
+          "version_conflict",
+          "duplicate_resolved_revision",
+          "insufficient_storage",
+          "download_task_state_mismatch",
+          "download_task_identity_mismatch",
+          "download_process_failed",
+          "staging_filesystem_mismatch",
+          "staging_cleanup_failed",
+          "artifact_file_list_invalid",
+          "artifact_manifest_hash_failed",
+          "model_layout_unsupported",
+          "artifact_required_files_invalid",
+          "artifact_safetensors_invalid",
+          "artifact_runtime_incompatible",
+          "external_path_unreadable",
+          "artifact_unsafe_file",
+          "artifact_publish_failed",
+          "rate_limit_exceeded",
+          "service_disabled",
+          "backend_unavailable",
+          "gateway_overloaded",
+          "usage_storage_unavailable",
+          "control_plane_unavailable",
+          "inference_timeout",
+          "resync_required"
+        ],
+        "title": "ErrorCode",
+        "type": "string"
+      },
+      "ErrorEnvelope": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorBody"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "title": "ErrorEnvelope",
+        "type": "object"
+      },
+      "JsonValue": {}
+    }
+  }
+}

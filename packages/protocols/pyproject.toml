@@ -1,0 +1,15 @@
+[project]
+name = "holm-protocols"
+version = "0.1.0rc1"
+description = "Protocol-independent inference contracts and orchestration"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "holm-domain==0.1.0rc1",
+]
+
+[tool.uv.sources]
+holm-domain = { workspace = true }
+
+[build-system]
+requires = ["uv_build==0.11.7"]
+build-backend = "uv_build"

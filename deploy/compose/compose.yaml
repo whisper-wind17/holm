@@ -1,0 +1,149 @@
+# Development-only topology: control-api binds loopback until Edge and immutable
+# platform images are built separately; this file is not the normative release Compose.
+# This document intentionally uses JSON form because the repository has no YAML parser
+# and its dependency-free validator must not add one. JSON is a YAML subset accepted by Compose.
+{
+  "name": "holm",
+  "services": {
+    "postgres": {
+      "image": "postgres:16.15-bookworm",
+      "user": "999:999",
+      "read_only": true,
+      "cap_drop": ["ALL"],
+      "security_opt": ["no-new-privileges:true"],
+      "tmpfs": [
+        # writable-tmpfs postgres /tmp: isolated temporary files required by the image entrypoint
+        "/tmp:rw,noexec,nosuid,nodev,size=64m,uid=999,gid=999",
+        # writable-tmpfs postgres /var/run/postgresql: PostgreSQL Unix socket and lock files
+        "/var/run/postgresql:rw,noexec,nosuid,nodev,size=16m,uid=999,gid=999"
+      ],
+      "environment": {
+        "POSTGRES_DB": "holm",
+        "POSTGRES_USER": "holm",
+        "POSTGRES_PASSWORD_FILE": "/run/secrets/postgres_password",
+        "PGDATA": "/var/lib/postgresql/data/pgdata"
+      },
+      "secrets": ["postgres_password"],
+      "volumes": [
+        # writable-bind postgres /var/lib/postgresql/data: persistent PGDATA storage
+        {
+          "type": "bind",
+          "source": "${HOLM_DATA_ROOT:-./data}/postgres",
+          "target": "/var/lib/postgresql/data",
+          "read_only": false
+        }
+      ],
+      "networks": ["holm-app"],
+      "healthcheck": {
+        "test": ["CMD-SHELL", "pg_isready -U holm -d holm"],
+        "interval": "5s",
+        "timeout": "5s",
+        "retries": 12
+      },
+      "restart": "unless-stopped"
+    },
+    "migrate": {
+      "image": "ghcr.io/astral-sh/uv:0.11.7-python3.12-bookworm-slim",
+      "user": "10001:10001",
+      "read_only": true,
+      "cap_drop": ["ALL"],
+      "security_opt": ["no-new-privileges:true"],
+      "tmpfs": [
+        # writable-tmpfs migrate /tmp: isolated process temporary files
+        "/tmp:rw,noexec,nosuid,nodev,size=64m,uid=10001,gid=10001",
+        # writable-tmpfs migrate /var/lib/holm-uv: uv project environment for the read-only workspace
+        "/var/lib/holm-uv:rw,nosuid,nodev,size=512m,uid=10001,gid=10001",
+        # writable-tmpfs migrate /var/cache/uv: uv package and build cache
+        "/var/cache/uv:rw,nosuid,nodev,size=512m,uid=10001,gid=10001"
+      ],
+      "working_dir": "/workspace",
+      "command": ["uv", "run", "--frozen", "alembic", "upgrade", "head"],
+      "environment": {
+        "HOLM_DATABASE_PASSWORD_FILE": "/run/secrets/postgres_password",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "UV_PROJECT_ENVIRONMENT": "/var/lib/holm-uv/venv",
+        "UV_CACHE_DIR": "/var/cache/uv"
+      },
+      "secrets": ["postgres_password"],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "../..",
+          "target": "/workspace",
+          "read_only": true
+        }
+      ],
+      "networks": ["holm-app"],
+      "depends_on": {
+        "postgres": {"condition": "service_healthy"}
+      },
+      "restart": "no"
+    },
+    "control-api": {
+      "image": "ghcr.io/astral-sh/uv:0.11.7-python3.12-bookworm-slim",
+      "user": "10001:10001",
+      "read_only": true,
+      "cap_drop": ["ALL"],
+      "security_opt": ["no-new-privileges:true"],
+      "tmpfs": [
+        # writable-tmpfs control-api /tmp: isolated process temporary files
+        "/tmp:rw,noexec,nosuid,nodev,size=64m,uid=10001,gid=10001",
+        # writable-tmpfs control-api /var/lib/holm-uv: uv project environment for the read-only workspace
+        "/var/lib/holm-uv:rw,nosuid,nodev,size=512m,uid=10001,gid=10001",
+        # writable-tmpfs control-api /var/cache/uv: uv package and build cache
+        "/var/cache/uv:rw,nosuid,nodev,size=512m,uid=10001,gid=10001"
+      ],
+      "working_dir": "/workspace",
+      "command": [
+        "uv", "run", "--frozen", "uvicorn",
+        "holm_control_api.application:create_app",
+        "--factory", "--host", "0.0.0.0", "--port", "8000"
+      ],
+      "environment": {
+        "HOLM_DATABASE_PASSWORD_FILE": "/run/secrets/postgres_password",
+        "HOLM_AGENT_SOCKET": "/run/holm/agent.sock",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "UV_PROJECT_ENVIRONMENT": "/var/lib/holm-uv/venv",
+        "UV_CACHE_DIR": "/var/cache/uv"
+      },
+      "secrets": ["postgres_password"],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "../..",
+          "target": "/workspace",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/run/holm",
+          "target": "/run/holm",
+          "read_only": true
+        }
+      ],
+      "networks": ["holm-app"],
+      "ports": ["127.0.0.1:8000:8000"],
+      "depends_on": {
+        "postgres": {"condition": "service_healthy"},
+        "migrate": {"condition": "service_completed_successfully"}
+      },
+      "healthcheck": {
+        "test": [
+          "CMD", "python", "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/internal/health/ready', timeout=2)"
+        ],
+        "interval": "5s",
+        "timeout": "3s",
+        "retries": 12
+      },
+      "restart": "unless-stopped"
+    }
+  },
+  "networks": {
+    "holm-app": {},
+    "holm-runtime": {"internal": true}
+  },
+  "secrets": {
+    "postgres_password": {"file": "${HOLM_SECRETS_ROOT:-./secrets}/postgres_password"}
+  }
+}

@@ -1,0 +1,228 @@
+{
+  "$defs": {
+    "IdentifiedValue_int_": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "const": "identified",
+          "default": "identified",
+          "title": "State",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "IdentifiedValue[int]",
+      "type": "object"
+    },
+    "IdentifiedValue_str_": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "const": "identified",
+          "default": "identified",
+          "title": "State",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "IdentifiedValue[str]",
+      "type": "object"
+    },
+    "IdentifiedValue_tuple_str__________": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "const": "identified",
+          "default": "identified",
+          "title": "State",
+          "type": "string"
+        },
+        "value": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Value",
+          "type": "array"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "IdentifiedValue[tuple[str, ...]]",
+      "type": "object"
+    },
+    "MetadataStatus": {
+      "description": "Whether a catalog Model's metadata was confirmed by its source.",
+      "enum": [
+        "CONFIRMED",
+        "UNCONFIRMED"
+      ],
+      "title": "MetadataStatus",
+      "type": "string"
+    },
+    "ModelOriginType": {
+      "description": "Complete Model source vocabulary.",
+      "enum": [
+        "Hugging Face",
+        "ModelScope",
+        "Local Path"
+      ],
+      "title": "ModelOriginType",
+      "type": "string"
+    },
+    "UnrecognizedValue": {
+      "additionalProperties": false,
+      "description": "A metadata field explicitly reported as \"\u672a\u8bc6\u522b\".\n\nIt has no ``value`` key at all, so the rendering cannot degrade into\n``null``, ``\"\"``, ``0``, ``false`` or a source default.",
+      "properties": {
+        "state": {
+          "const": "unrecognized",
+          "default": "unrecognized",
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "title": "UnrecognizedValue",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Safe Model metadata projection; source keys and External Paths are absent.",
+  "properties": {
+    "architecture": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/IdentifiedValue_str_"
+        },
+        {
+          "$ref": "#/$defs/UnrecognizedValue"
+        }
+      ],
+      "title": "Architecture"
+    },
+    "candidate_runtimes": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/IdentifiedValue_tuple_str__________"
+        },
+        {
+          "$ref": "#/$defs/UnrecognizedValue"
+        }
+      ],
+      "title": "Candidate Runtimes"
+    },
+    "context_length": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/IdentifiedValue_int_"
+        },
+        {
+          "$ref": "#/$defs/UnrecognizedValue"
+        }
+      ],
+      "title": "Context Length"
+    },
+    "display_name": {
+      "title": "Display Name",
+      "type": "string"
+    },
+    "estimated_size_bytes": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/IdentifiedValue_int_"
+        },
+        {
+          "$ref": "#/$defs/UnrecognizedValue"
+        }
+      ],
+      "title": "Estimated Size Bytes"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "license": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/IdentifiedValue_str_"
+        },
+        {
+          "$ref": "#/$defs/UnrecognizedValue"
+        }
+      ],
+      "title": "License"
+    },
+    "metadata_status": {
+      "$ref": "#/$defs/MetadataStatus"
+    },
+    "modalities": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/IdentifiedValue_tuple_str__________"
+        },
+        {
+          "$ref": "#/$defs/UnrecognizedValue"
+        }
+      ],
+      "title": "Modalities"
+    },
+    "precision": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/IdentifiedValue_str_"
+        },
+        {
+          "$ref": "#/$defs/UnrecognizedValue"
+        }
+      ],
+      "title": "Precision"
+    },
+    "quantization": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/IdentifiedValue_str_"
+        },
+        {
+          "$ref": "#/$defs/UnrecognizedValue"
+        }
+      ],
+      "title": "Quantization"
+    },
+    "replayed": {
+      "title": "Replayed",
+      "type": "boolean"
+    },
+    "source": {
+      "$ref": "#/$defs/ModelOriginType"
+    }
+  },
+  "required": [
+    "id",
+    "source",
+    "display_name",
+    "architecture",
+    "modalities",
+    "precision",
+    "quantization",
+    "context_length",
+    "candidate_runtimes",
+    "estimated_size_bytes",
+    "license",
+    "metadata_status",
+    "replayed"
+  ],
+  "title": "RegisteredModelResponse",
+  "type": "object"
+}

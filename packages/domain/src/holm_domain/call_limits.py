@@ -1,0 +1,10 @@
+"""User × AI Service admission policy constants."""
+
+from typing import Final
+
+DEFAULT_MAX_CONCURRENT_REQUESTS: Final = 8
+MAX_CONCURRENT_REQUESTS: Final = 64
+MAX_REQUESTS_PER_MINUTE: Final = 600
+CALL_LIMIT_QUEUE_SIZE: Final = 32
+CALL_LIMIT_WAIT_SECONDS: Final = 60.0
+CALL_LIMIT_WINDOW_SECONDS: Final = 60.0

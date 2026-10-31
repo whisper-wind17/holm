@@ -1,0 +1,22 @@
+[project]
+name = "holm-host-agent"
+version = "0.1.0rc1"
+description = "Private AI Workspace privileged host boundary"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "grpcio==1.83.1",
+  "nvidia-ml-py==13.595.45",
+  "holm-contracts==0.1.0rc1",
+  "holm-runtimes==0.1.0rc1",
+]
+
+[project.scripts]
+holm-host-agent = "holm_host_agent.__main__:main"
+
+[tool.uv.sources]
+holm-contracts = { workspace = true }
+holm-runtimes = { workspace = true }
+
+[build-system]
+requires = ["uv_build==0.11.7"]
+build-backend = "uv_build"

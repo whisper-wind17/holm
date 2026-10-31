@@ -1,0 +1,146 @@
+{
+  "$defs": {
+    "ModelSourceConfigurationState": {
+      "description": "Credential configuration states that must remain distinguishable.",
+      "enum": [
+        "unconfigured",
+        "configured",
+        "key_unavailable"
+      ],
+      "title": "ModelSourceConfigurationState",
+      "type": "string"
+    },
+    "ModelSourceResponse": {
+      "additionalProperties": false,
+      "description": "Safe response vocabulary; IDs, Key fields, and Endpoints are absent.",
+      "properties": {
+        "configuration_state": {
+          "$ref": "#/$defs/ModelSourceConfigurationState"
+        },
+        "credential_last4": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Credential Last4"
+        },
+        "next_action": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ModelSourceValidationAction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_type": {
+          "$ref": "#/$defs/ModelSourceType"
+        },
+        "verification_reason_code": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ModelSourceValidationReason"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "verification_status": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ModelSourceValidationStatus"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "verified_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Verified At"
+        }
+      },
+      "required": [
+        "source_type",
+        "configuration_state",
+        "credential_last4",
+        "verification_status",
+        "verified_at",
+        "verification_reason_code",
+        "next_action"
+      ],
+      "title": "ModelSourceResponse",
+      "type": "object"
+    },
+    "ModelSourceType": {
+      "description": "Credential-bearing official model sources.",
+      "enum": [
+        "Hugging Face",
+        "ModelScope"
+      ],
+      "title": "ModelSourceType",
+      "type": "string"
+    },
+    "ModelSourceValidationAction": {
+      "description": "Stable operator directions derived from a validation conclusion.",
+      "enum": [
+        "update_credential",
+        "check_source_access",
+        "check_source_reference",
+        "check_source_reference_and_configure_credential",
+        "retry_later",
+        "install_validator"
+      ],
+      "title": "ModelSourceValidationAction",
+      "type": "string"
+    },
+    "ModelSourceValidationReason": {
+      "description": "Stable, sanitized reasons returned by the validation boundary.",
+      "enum": [
+        "credential_valid",
+        "credential_invalid",
+        "source_permission_denied",
+        "source_not_found",
+        "source_not_found_or_inaccessible",
+        "source_rate_limited",
+        "validator_unavailable",
+        "validation_timeout",
+        "validation_failed"
+      ],
+      "title": "ModelSourceValidationReason",
+      "type": "string"
+    },
+    "ModelSourceValidationStatus": {
+      "description": "Observable source outcomes persisted after validation.",
+      "enum": [
+        "accessible",
+        "invalid_credential",
+        "permission_denied",
+        "not_found",
+        "rate_limited"
+      ],
+      "title": "ModelSourceValidationStatus",
+      "type": "string"
+    }
+  },
+  "description": "The complete response body returned by GET /system/model-sources.",
+  "items": {
+    "$ref": "#/$defs/ModelSourceResponse"
+  },
+  "title": "ModelSourceListResponse",
+  "type": "array"
+}

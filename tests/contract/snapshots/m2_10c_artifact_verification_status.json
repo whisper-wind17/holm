@@ -1,0 +1,63 @@
+{
+  "$defs": {
+    "JobStatus": {
+      "description": "Persisted job states matching the database values.",
+      "enum": [
+        "Queued",
+        "Running",
+        "Succeeded",
+        "Failed"
+      ],
+      "title": "JobStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Persisted job progress is separate from Artifact health.",
+  "properties": {
+    "status": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/JobStatus"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "job_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Job Id"
+    },
+    "error_code": {
+      "anyOf": [
+        {
+          "enum": [
+            "artifact_verify_unsafe_path",
+            "artifact_verify_failed"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Error Code"
+    }
+  },
+  "required": [
+    "status",
+    "job_id",
+    "error_code"
+  ],
+  "title": "ArtifactVerificationStatusResponse",
+  "type": "object"
+}

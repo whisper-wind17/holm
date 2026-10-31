@@ -1,0 +1,17 @@
+[project]
+name = "holm-security"
+version = "0.1.0rc1"
+description = "Password, token and credential primitives for Private AI Workspace"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "argon2-cffi==25.1.0",
+  "cryptography==50.0.1",
+  "holm-common==0.1.0rc1",
+]
+
+[tool.uv.sources]
+holm-common = { workspace = true }
+
+[build-system]
+requires = ["uv_build==0.11.7"]
+build-backend = "uv_build"

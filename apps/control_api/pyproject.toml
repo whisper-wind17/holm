@@ -1,0 +1,33 @@
+[project]
+name = "holm-control-api"
+version = "0.1.0rc1"
+description = "Private AI Workspace control API application boundary"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "fastapi==0.141.1",
+  "grpcio==1.83.1",
+  "hf-xet==1.6.0",
+  "huggingface-hub==1.28.0",
+  "modelscope==1.39.1",
+  "holm-common==0.1.0rc1",
+  "holm-contracts==0.1.0rc1",
+  "holm-domain==0.1.0rc1",
+  "holm-persistence==0.1.0rc1",
+  "holm-runtimes==0.1.0rc1",
+  "holm-security==0.1.0rc1",
+  "holm-telemetry==0.1.0rc1",
+  "uvicorn==0.52.4",
+]
+
+[tool.uv.sources]
+holm-common = { workspace = true }
+holm-contracts = { workspace = true }
+holm-domain = { workspace = true }
+holm-persistence = { workspace = true }
+holm-runtimes = { workspace = true }
+holm-security = { workspace = true }
+holm-telemetry = { workspace = true }
+
+[build-system]
+requires = ["uv_build==0.11.7"]
+build-backend = "uv_build"

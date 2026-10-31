@@ -1,0 +1,224 @@
+{
+  "$defs": {
+    "DownloadCommand": {
+      "enum": [
+        "pause",
+        "resume",
+        "cancel",
+        "retry"
+      ],
+      "title": "DownloadCommand",
+      "type": "string"
+    },
+    "DownloadFailureStage": {
+      "description": "Pipeline stage at which a Download Task failed.\n\nThe words are the state names of the stages that actually persist an\n``error_code``.  ``Queued`` is absent on purpose: nothing writes a code while\na task waits, so a ``Queued`` member would be a stage no row can ever carry.",
+      "enum": [
+        "Resolving",
+        "Downloading",
+        "Verifying",
+        "Publishing"
+      ],
+      "title": "DownloadFailureStage",
+      "type": "string"
+    },
+    "DownloadTaskItemResponse": {
+      "additionalProperties": false,
+      "description": "One Download Task row.\n\n``revision`` carries only a resolved, immutable Revision.  The persisted\n``requested_revision_norm`` is never projected: it exists from ``Queued``\nonwards but means nothing until resolution, and when the administrator named\nno Revision its value is the internal sentinel ``@default``.\n\nThere is no speed and no ETA field.  ``core.download_tasks`` holds a single\nobservation per task, and a rate needs two; ``downloaded_bytes`` over elapsed\ntime would be wrong for any task that was ever paused or resumed from\nstaging, and wrong in a way that looks authoritative.  The client differences two\npolls instead.  For the same reason a percentage is absent: with\n``total_bytes`` unknown there is no honest one.",
+      "properties": {
+        "attempt": {
+          "minimum": 1,
+          "title": "Attempt",
+          "type": "integer"
+        },
+        "available_commands": {
+          "items": {
+            "$ref": "#/$defs/DownloadCommand"
+          },
+          "title": "Available Commands",
+          "type": "array"
+        },
+        "completed_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Completed At"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "display_name": {
+          "title": "Display Name",
+          "type": "string"
+        },
+        "downloaded_bytes": {
+          "minimum": 0,
+          "title": "Downloaded Bytes",
+          "type": "integer"
+        },
+        "error_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Error Code"
+        },
+        "failure_stage": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DownloadFailureStage"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "model_id": {
+          "format": "uuid",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "repository_id": {
+          "title": "Repository Id",
+          "type": "string"
+        },
+        "revision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Revision"
+        },
+        "source": {
+          "$ref": "#/$defs/ModelOriginType"
+        },
+        "staging_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Staging Path"
+        },
+        "status": {
+          "$ref": "#/$defs/DownloadTaskStatus"
+        },
+        "total_bytes": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Total Bytes"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "model_id",
+        "display_name",
+        "source",
+        "repository_id",
+        "revision",
+        "status",
+        "attempt",
+        "downloaded_bytes",
+        "total_bytes",
+        "staging_path",
+        "error_code",
+        "failure_stage",
+        "available_commands",
+        "created_at",
+        "updated_at",
+        "completed_at"
+      ],
+      "title": "DownloadTaskItemResponse",
+      "type": "object"
+    },
+    "DownloadTaskStatus": {
+      "description": "Download Task lifecycle states.",
+      "enum": [
+        "Queued",
+        "Resolving",
+        "Downloading",
+        "Paused",
+        "Verifying",
+        "Publishing",
+        "Completed",
+        "Failed",
+        "Cancelled"
+      ],
+      "title": "DownloadTaskStatus",
+      "type": "string"
+    },
+    "ModelOriginType": {
+      "description": "Complete Model source vocabulary.",
+      "enum": [
+        "Hugging Face",
+        "ModelScope",
+        "Local Path"
+      ],
+      "title": "ModelOriginType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "items": {
+      "items": {
+        "$ref": "#/$defs/DownloadTaskItemResponse"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "next_cursor": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Next Cursor"
+    }
+  },
+  "required": [
+    "items"
+  ],
+  "title": "CursorPage[DownloadTaskItemResponse]",
+  "type": "object"
+}

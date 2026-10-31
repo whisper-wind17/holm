@@ -1,0 +1,1080 @@
+/* ============================================================================
+   Holm — v0.1 视觉令牌层
+   ----------------------------------------------------------------------------
+   本文件是视觉令牌的唯一定义源。
+   来源：Claude Design 原型「设计基础」页定稿，经 UI-VISUAL-BASELINE-REVISION.md
+   改动令牌时须同步视觉设计规范。
+   字体与图标资源自托管，不引入外部 CDN。
+   所有值均取自 Adobe Spectrum 2（_ds/spectrum2/tokens/*.css），本层只做
+   「语义重命名 + 交互态补全」，不引入 Spectrum 之外的新色。
+   命名规则： --pw-<类别>-<角色>-<状态>
+   v0.1 只交付浅色主题；深色主题只需在 [data-pw-theme="dark"] 重定义本层。
+   ========================================================================== */
+:root {
+  /* ---- 1. 表面 Surface -------------------------------------------------- */
+  --pw-surface-base: #ffffff; /* 内容区底 (S2 background-base) */
+  --pw-surface-raised: #ffffff; /* 卡片 / 表格容器，配 shadow-card */
+  --pw-surface-chrome: #f8f8f8; /* 左侧导航（S2 layer-1） */
+  --pw-surface-bar: #ffffff; /* 顶栏（S2 layer-2） */
+  --pw-surface-subtle: #f8f8f8; /* 只读字段、代码块、Endpoint 条 */
+  --pw-surface-sunken: #f3f3f3; /* 骨架底、进度槽 */
+  --pw-surface-overlay: #ffffff; /* Modal / Drawer / Popover / Toast */
+  --pw-surface-hover: #f3f3f3; /* 行 / 菜单项 hover */
+  --pw-surface-active: #e9e9e9; /* 行 / 菜单项 active */
+  --pw-surface-selected: #e6eeff; /* 选中行、导航选中（accent-subtle） */
+  --pw-scrim: rgba(0, 0, 0, 0.4); /* Modal 遮罩 */
+
+  /* ---- 2. 文本 Text ---------------------------------------------------- */
+  --pw-text-primary: #292929; /* gray-800  正文与标题 */
+  --pw-text-secondary: #505050; /* gray-700  辅助说明（对白 8.06:1） */
+  --pw-text-tertiary: #717171; /* gray-600  Placeholder / 空值 —（对白 4.88:1） */
+  --pw-text-disabled: #c6c6c6; /* gray-400  禁用文字 */
+  --pw-text-on-fill: #ffffff; /* 实色填充上的文字 */
+  --pw-text-link: #0b5cff; /* accent-900 */
+  --pw-text-link-hover: #0a4bd6; /* accent-1000 */
+
+  /* ---- 3. 边框 Border -------------------------------------------------- */
+  --pw-border-hairline: #e1e1e1; /* gray-200  1px 面板 / 表格行分隔 */
+  --pw-border-default: #dadada; /* gray-300  2px 控件静态边框 */
+  --pw-border-hover: #8f8f8f; /* gray-500  控件 hover */
+  --pw-border-strong: #292929; /* gray-800  控件 focus / 选中 */
+  --pw-border-disabled: #dadada; /* gray-300 */
+  --pw-width-hairline: 1px;
+  --pw-width-control: 2px;
+  --pw-width-divider-heavy: 4px;
+
+  /* ---- 4. 品牌 / 主操作 Accent ----------------------------------------- */
+  --pw-accent-fill: #0b5cff; /* accent-900  Primary 按钮底 */
+  --pw-accent-fill-hover: #0a4bd6; /* accent-1000 */
+  --pw-accent-fill-down: #0a4bd6; /* 按压＝同色 + 3D 位移，不再加深 */
+  --pw-accent-text: #0b5cff; /* 链接、选中标签文字 */
+  --pw-accent-text-on-tint: #0a45c2; /* accent-subtle 底上的文字（6.82:1） */
+  --pw-accent-tint: #e6eeff; /* accent-200 选中底 */
+  --pw-accent-border: #c7d9ff; /* accent-300 */
+  --pw-focus-ring: #3d7bff; /* accent-800 焦点环 */
+  --pw-focus-ring-width: 2px;
+  --pw-focus-ring-offset: 2px;
+
+  /* ---- 5. 中性动作 Neutral（Secondary / Ghost / 已停止类状态） --------- */
+  --pw-neutral-fill: #292929; /* gray-800 选中反色填充 */
+  --pw-neutral-fill-hover: #131313; /* gray-900 */
+  --pw-neutral-tint: #e9e9e9; /* gray-100 中性徽章底 */
+  --pw-neutral-border: #dadada; /* gray-300 */
+  --pw-neutral-text: #505050; /* gray-700 中性徽章文字（对 tint 6.64:1） */
+  --pw-neutral-icon: #717171; /* gray-600 */
+
+  /* ---- 6. 状态语义色 Status（徽章 / 横幅 / 内联提示共用） -------------- */
+  /* 规则：文字与图标统一取 -1000 阶，底取 -200 阶，边框取 -300 阶。
+     该组合在白底与自身 tint 底上均 ≥5.4:1。                            */
+  --pw-positive-text: #036e45;
+  --pw-positive-tint: #d7f7e1;
+  --pw-positive-border: #adeec5;
+  --pw-positive-fill: #05834e;
+  --pw-notice-text: #a73e00;
+  --pw-notice-tint: #ffeccf;
+  --pw-notice-border: #ffda9e;
+  --pw-notice-fill: #c24e00;
+  --pw-negative-text: #b72818;
+  --pw-negative-tint: #ffebe8;
+  --pw-negative-border: #ffd6d1;
+  --pw-negative-fill: #d73220;
+  --pw-negative-fill-hover: #b72818;
+  --pw-info-text: #0a45c2;
+  --pw-info-tint: #e6eeff;
+  --pw-info-border: #c7d9ff;
+  --pw-info-fill: #0b5cff;
+  --pw-idle-text: #505050;
+  --pw-idle-tint: #e9e9e9;
+  --pw-idle-border: #dadada;
+  --pw-idle-fill: #505050;
+
+  /* 深色底（Toast / 反色填充 #292929）上的状态图标：取同色族浅阶，
+     与深色底对比度对齐到 ≈9.1:1，使三色在同一底上的视觉重量一致。   */
+  --pw-positive-on-fill: #6be3a2; /* 对 #292929 9.09:1 */
+  --pw-negative-on-fill: #f5c0ba; /* 对 #292929 9.09:1 */
+  --pw-accent-on-fill: #b4cdff; /* 对 #292929 9.08:1 */
+
+  /* ---- 6b. 图表 Chart ------------------------------------------------- */
+  /* 分类色＝序列身份。按固定顺序取用，永不循环、永不按数值排名着色。
+     三槽已通过全对比校验（normal + protanopia + deuteranopia，Machado 2009
+     severity 1.0）：最差 ΔE 17.2，全部 ≥3:1。**超过 3 条序列**时必须归入
+     「其他」或改为小倍数，不得新增色相——8 色在全对比下无法两两可分。
+     状态色（positive / notice / negative）为保留语义，不得充当序列色。   */
+  --pw-chart-cat-1: #0b5cff; /* ＝accent-fill，品牌蓝 */
+  --pw-chart-cat-2: #8f1261; /* pink-500 */
+  --pw-chart-cat-3: #0b97a4; /* turquoise-900 */
+
+  /* 序数色＝同一度量的有序序列（P50/P95/P99、分档）。单色相、由浅到深，
+     相邻 ΔL ≥0.06，浅端对白底 2.38:1。有序关系必须看得出来。            */
+  --pw-chart-ord-1: #7fa6ff; /* P50 / 最低档 */
+  --pw-chart-ord-2: #0b5cff; /* P95 / 中档 */
+  --pw-chart-ord-3: #0a2f8f; /* P99 / 最高档 */
+
+  /* 图表结构：网格与坐标轴一律退到背景，1px 实线，不用虚线 */
+  --pw-chart-grid: #e9e9e9;
+  --pw-chart-axis: #717171;
+  --pw-chart-line-w: 2px; /* 折线宽度，圆角端点 */
+  --pw-chart-area-op: 0.1; /* 面积填充透明度，只做淡洗 */
+  --pw-chart-dot-r: 4px; /* 端点半径 ≥4（直径 ≥8） */
+  --pw-chart-gap: 2px; /* 相邻/堆叠标记之间的表面色间隙 */
+
+  /* ---- 7. 禁用 Disabled（S2：实色三件套，不用 opacity） --------------- */
+  --pw-disabled-fill: #e9e9e9;
+  --pw-disabled-border: #dadada;
+  --pw-disabled-text: #c6c6c6;
+
+  /* ---- 8. 字体 Typography --------------------------------------------- */
+  --pw-font-sans:
+    "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", ui-sans-serif,
+    system-ui, sans-serif;
+  --pw-font-mono:
+    "Source Code Pro", "SFMono-Regular", Consolas, "Noto Sans SC", monospace;
+
+  --pw-size-page-title: 22px;
+  --pw-lh-page-title: 28px; /* 页面标题 800 */
+  --pw-size-section: 18px;
+  --pw-lh-section: 24px; /* 区块标题 700 */
+  --pw-size-card: 16px;
+  --pw-lh-card: 22px; /* 卡片标题 700 */
+  --pw-size-body: 14px;
+  --pw-lh-body: 21px; /* 正文 400 */
+  --pw-size-ui: 14px;
+  --pw-lh-ui: 18px; /* 控件标签 500 */
+  --pw-size-table-head: 13px;
+  --pw-lh-table-head: 18px; /* 表头 600 */
+  --pw-size-aux: 12px;
+  --pw-lh-aux: 18px; /* 辅助 400（非关键信息） */
+  --pw-size-detail: 11px;
+  --pw-lh-detail: 14px; /* 全大写栏目标签 500 / 0.06em */
+  --pw-size-metric: 28px;
+  --pw-lh-metric: 32px; /* 指标数字 600 等宽 */
+  --pw-size-metric-sm: 20px;
+  --pw-lh-metric-sm: 26px; /* 次级指标 600 等宽 */
+  --pw-weight-regular: 400;
+  --pw-weight-medium: 500;
+  --pw-weight-semibold: 600;
+  --pw-weight-bold: 700;
+  --pw-weight-heading: 800;
+  /* 按钮字重单独立一个令牌：中文在 14 px 下 700 的笔画密度明显重于拉丁字母，
+     渲染对比后取 600：比 500 多一点按钮应有的重量感，又不会像 700 那样发糊。 */
+  --pw-weight-button: 600;
+  --pw-tracking-detail: 0.06em;
+
+  /* ---- 9. 间距 Spacing（4px 网格） ------------------------------------ */
+  --pw-space-2: 2px;
+  --pw-space-4: 4px;
+  --pw-space-8: 8px;
+  --pw-space-12: 12px;
+  --pw-space-16: 16px;
+  --pw-space-24: 24px;
+  --pw-space-32: 32px;
+  --pw-space-40: 40px;
+  --pw-space-48: 48px;
+  --pw-space-64: 64px;
+  --pw-space-80: 80px;
+
+  /* ---- 10. 圆角 Radius ----------------------------------------------- */
+  --pw-radius-sm: 4px; /* Checkbox、进度条、骨架条 */
+  --pw-radius-md: 8px; /* 按钮、输入框、图标按钮、菜单项 */
+  --pw-radius-lg: 10px; /* 卡片、Popover、表格容器 */
+  --pw-radius-xl: 16px; /* Modal / Drawer / 登录卡 */
+  --pw-radius-pill: 999px; /* 状态徽章、筛选标签。按钮改用 radius-md（8px）：运维控制台取工具化的矩形观感，
+                              且 16px 内距＝height×3/8 正是 S2 给非胶囊按钮的推导规则 */
+
+  /* ---- 11. 阴影 Elevation（S2 三层柔和阴影，不做环境压暗） ----------- */
+  --pw-shadow-card:
+    0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04),
+    0 0 1px rgba(0, 0, 0, 0.08);
+  --pw-shadow-overlay:
+    0 4px 12px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08),
+    0 0 2px rgba(0, 0, 0, 0.1);
+  --pw-shadow-dragged:
+    0 12px 16px rgba(0, 0, 0, 0.16), 0 6px 8px rgba(0, 0, 0, 0.1),
+    0 0 6px rgba(0, 0, 0, 0.08);
+
+  /* ---- 12. 控件尺寸 Sizing ------------------------------------------- */
+  --pw-control-h-s: 32px; /* 表格行内按钮、筛选标签（命中区扩至 44） */
+  --pw-control-h-m: 40px; /* 默认按钮、输入框、下拉（命中区扩至 44） */
+  --pw-control-h-l: 48px; /* 登录 / 向导等单列表单主控件 */
+  --pw-hit-min: 44px; /* 最小交互目标 */
+  --pw-row-h: 48px; /* 紧凑表格行 */
+  --pw-row-head-h: 40px; /* 表头 */
+  --pw-topbar-h: 56px;
+  --pw-nav-w: 240px;
+  --pw-nav-w-collapsed: 64px;
+  --pw-content-max: 1440px;
+  --pw-form-max: 880px;
+
+  /* AI 服务列表列宽表；服务列承接余宽。 */
+  --pw-svc-col-name: 200px;
+  --pw-svc-col-instance: 220px;
+  --pw-svc-col-authorized-users: 76px;
+  --pw-svc-col-today-requests: 88px;
+  --pw-svc-col-ttft: 100px;
+  --pw-svc-col-error-rate: 84px;
+  --pw-svc-col-service-tps: 84px;
+  --pw-svc-col-concurrency: 104px;
+  --pw-svc-col-actions: 150px;
+
+  /* 按钮左右内距：改用 S2「内距由高度派生」的 height × 3/8 档，对齐 4px 网格，
+     得 32 → 12 / 40 → 16 / 48 → 20。原先用 pill 公式（height ÷ 2 = 20），在中文
+     短标签下横向扩张过大。三档高度、pill 圆角与 accent 蓝均不变。 */
+  --pw-btn-pad-s: 12px;
+  --pw-btn-pad-m: 16px;
+  --pw-btn-pad-l: 20px;
+
+  /* ---- 13. 层级 z-index --------------------------------------------- */
+  --pw-z-base: 0;
+  --pw-z-sticky-thead: 10;
+  --pw-z-nav: 20;
+  --pw-z-topbar: 30;
+  --pw-z-banner: 40;
+  --pw-z-drawer: 400;
+  --pw-z-scrim: 500;
+  --pw-z-modal: 510;
+  --pw-z-popover: 600;
+  --pw-z-toast: 700;
+  --pw-z-tooltip: 800;
+
+  /* ---- 14. 动效 Motion ---------------------------------------------- */
+  --pw-ease: cubic-bezier(0.45, 0, 0.4, 1);
+  --pw-dur-state: 150ms; /* 颜色 / 阴影状态切换 */
+  --pw-dur-overlay: 200ms; /* 弹层进出，附 4px 位移 */
+  --pw-press: perspective(40px) translate3d(0, 0, -2px);
+
+  /* ---- 15. 弹层与容器宽度 ------------------------------------------ */
+  --pw-modal-s: 400px; /* 确认 / 危险操作 */
+  --pw-modal-m: 560px; /* 单列表单 */
+  --pw-modal-l: 720px; /* 带说明的表单、一次性密钥 */
+  --pw-modal-xl: 880px; /* 向导步骤、并排对照 */
+  --pw-drawer-w: 480px; /* 详情抽屉 */
+  --pw-drawer-w-wide: 640px;
+  --pw-toast-min: 288px;
+  --pw-toast-max: 480px;
+}
+
+/* ============================ 基础 ==================================== */
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font: var(--pw-weight-regular) var(--pw-size-body)/var(--pw-lh-body)
+    var(--pw-font-sans);
+  color: var(--pw-text-primary);
+  background: var(--pw-surface-base);
+  -webkit-font-smoothing: antialiased;
+}
+a {
+  color: var(--pw-text-link);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--pw-text-link-hover);
+  text-decoration: underline;
+}
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: var(--pw-focus-ring-width) solid var(--pw-focus-ring);
+  outline-offset: var(--pw-focus-ring-offset);
+  border-radius: var(--pw-radius-sm);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* ============================ 排版工具 =============================== */
+.t-page {
+  font-size: var(--pw-size-page-title);
+  line-height: var(--pw-lh-page-title);
+  font-weight: var(--pw-weight-heading);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.t-section {
+  font-size: var(--pw-size-section);
+  line-height: var(--pw-lh-section);
+  font-weight: var(--pw-weight-bold);
+  margin: 0;
+}
+.t-card {
+  font-size: var(--pw-size-card);
+  line-height: var(--pw-lh-card);
+  font-weight: var(--pw-weight-bold);
+  margin: 0;
+}
+.t-body {
+  font-size: var(--pw-size-body);
+  line-height: var(--pw-lh-body);
+}
+.t-ui {
+  font-size: var(--pw-size-ui);
+  line-height: var(--pw-lh-ui);
+  font-weight: var(--pw-weight-medium);
+}
+.t-aux {
+  font-size: var(--pw-size-aux);
+  line-height: var(--pw-lh-aux);
+}
+.t-detail {
+  font-size: var(--pw-size-detail);
+  line-height: var(--pw-lh-detail);
+  font-weight: var(--pw-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: var(--pw-tracking-detail);
+  color: var(--pw-text-secondary);
+}
+.t-metric {
+  font-family: var(--pw-font-mono);
+  font-size: var(--pw-size-metric);
+  line-height: var(--pw-lh-metric);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.t-metric-sm {
+  font-family: var(--pw-font-mono);
+  font-size: var(--pw-size-metric-sm);
+  line-height: var(--pw-lh-metric-sm);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.mono {
+  font-family: var(--pw-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.c-2 {
+  color: var(--pw-text-secondary);
+}
+.c-3 {
+  color: var(--pw-text-tertiary);
+}
+.c-pos {
+  color: var(--pw-positive-text);
+}
+.c-neg {
+  color: var(--pw-negative-text);
+}
+.c-not {
+  color: var(--pw-notice-text);
+}
+.c-inf {
+  color: var(--pw-info-text);
+}
+.nowrap {
+  white-space: nowrap;
+}
+.grow {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ============================ 图标 ==================================== */
+/* S2 做法：SVG 作为 currentColor 上的 CSS mask，图标永远继承文字色。 */
+.pwi {
+  display: inline-block;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  background: currentColor;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+.pwi-xs {
+  width: 14px;
+  height: 14px;
+}
+.pwi-s {
+  width: 16px;
+  height: 16px;
+}
+.pwi-l {
+  width: 22px;
+  height: 22px;
+}
+.pwi-xl {
+  width: 26px;
+  height: 26px;
+}
+.pwi-96 {
+  width: 72px;
+  height: 72px;
+}
+/* 每个图标的 mask-image 规则见同目录 icons.css —— 它依赖 SVG 资源文件，
+   与纯令牌层分开，便于单独校验资源是否齐备。 */
+
+/* ============================ 状态徽章 =============================== */
+/* 结构固定为「图标 + 中文状态 + 可选说明」。
+   颜色永不作为唯一信号：每个徽章都带专属图标与中文文字。 */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px 0 8px;
+  border-radius: var(--pw-radius-pill);
+  border: var(--pw-width-control) solid transparent;
+  font-size: var(--pw-size-aux);
+  line-height: 1;
+  font-weight: var(--pw-weight-medium);
+  white-space: nowrap;
+}
+.badge .pwi {
+  width: 14px;
+  height: 14px;
+}
+.badge-lg {
+  height: 28px;
+  padding: 0 12px 0 10px;
+  font-size: var(--pw-size-body);
+}
+.b-pos {
+  background: var(--pw-positive-tint);
+  border-color: var(--pw-positive-border);
+  color: var(--pw-positive-text);
+}
+.b-not {
+  background: var(--pw-notice-tint);
+  border-color: var(--pw-notice-border);
+  color: var(--pw-notice-text);
+}
+.b-neg {
+  background: var(--pw-negative-tint);
+  border-color: var(--pw-negative-border);
+  color: var(--pw-negative-text);
+}
+.b-inf {
+  background: var(--pw-info-tint);
+  border-color: var(--pw-info-border);
+  color: var(--pw-info-text);
+}
+.b-idle {
+  background: var(--pw-idle-tint);
+  border-color: var(--pw-idle-border);
+  color: var(--pw-idle-text);
+}
+.badge-note {
+  color: var(--pw-text-secondary);
+  font-size: var(--pw-size-aux);
+  margin-left: 8px;
+}
+
+/* 状态点（仅用于导航等空间极窄处，必须与文字同时出现） */
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  flex: none;
+}
+.dot-pos {
+  background: var(--pw-positive-fill);
+}
+.dot-not {
+  background: var(--pw-notice-fill);
+}
+.dot-neg {
+  background: var(--pw-negative-fill);
+}
+.dot-idle {
+  background: var(--pw-neutral-icon);
+}
+
+/* ============================ 按钮 ==================================== */
+/* 字重取 --pw-weight-button（600）、左右内距取 height × 3/8：中文短标签在
+   14 px / 700 下笔画过密，再配 pill 公式的 20 px 内距，按钮整体会显得过大。
+   三档高度（32 / 40 / 48）、pill 圆角与 accent 蓝保持不变。 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  position: relative;
+  height: var(--pw-control-h-m);
+  padding: 0 var(--pw-btn-pad-m);
+  border-radius: var(--pw-radius-md);
+  border: var(--pw-width-control) solid transparent;
+  font: var(--pw-weight-button) var(--pw-size-ui)/1 var(--pw-font-sans);
+  cursor: pointer;
+  white-space: nowrap;
+  background: none;
+  transition:
+    background-color var(--pw-dur-state) var(--pw-ease),
+    border-color var(--pw-dur-state) var(--pw-ease),
+    color var(--pw-dur-state) var(--pw-ease),
+    transform var(--pw-dur-state) var(--pw-ease);
+}
+/* 视觉高度 40，命中区补到 44×44 */
+.btn::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: var(--pw-hit-min);
+}
+.btn:active:not([disabled]) {
+  transform: var(--pw-press);
+}
+.btn-s {
+  height: var(--pw-control-h-s);
+  padding: 0 var(--pw-btn-pad-s);
+  font-size: var(--pw-size-aux);
+}
+.btn-l {
+  height: var(--pw-control-h-l);
+  padding: 0 var(--pw-btn-pad-l);
+  font-size: var(--pw-size-card);
+}
+.btn-block {
+  width: 100%;
+}
+.btn-primary {
+  background: var(--pw-accent-fill);
+  color: var(--pw-text-on-fill);
+}
+.btn-primary:hover {
+  background: var(--pw-accent-fill-hover);
+}
+.btn-secondary {
+  border-color: var(--pw-border-default);
+  color: var(--pw-text-primary);
+}
+.btn-secondary:hover {
+  border-color: var(--pw-border-hover);
+  background: var(--pw-surface-hover);
+}
+.btn-ghost {
+  color: var(--pw-text-primary);
+  padding: 0 10px;
+}
+.btn-ghost:hover {
+  background: var(--pw-surface-hover);
+}
+.btn-danger {
+  background: var(--pw-negative-fill);
+  color: var(--pw-text-on-fill);
+}
+.btn-danger:hover {
+  background: var(--pw-negative-fill-hover);
+}
+.btn[disabled],
+.btn-disabled {
+  background: var(--pw-disabled-fill);
+  border-color: var(--pw-disabled-border);
+  color: var(--pw-disabled-text);
+  cursor: not-allowed;
+}
+.btn-icon {
+  width: var(--pw-control-h-s);
+  height: var(--pw-control-h-s);
+  padding: 0;
+  border-radius: var(--pw-radius-md);
+  color: var(--pw-text-secondary);
+}
+.btn-icon:hover {
+  background: var(--pw-surface-hover);
+  color: var(--pw-text-primary);
+}
+.btn-icon::after {
+  left: 50%;
+  top: 50%;
+  right: auto;
+  width: var(--pw-hit-min);
+  transform: translate(-50%, -50%);
+}
+.btn-link {
+  color: var(--pw-text-link);
+  background: none;
+  border: none;
+  padding: 0 4px;
+  height: var(--pw-control-h-s);
+  font-weight: var(--pw-weight-medium);
+}
+.btn-link:hover {
+  text-decoration: underline;
+}
+.btn-link[disabled] {
+  background: none;
+  color: var(--pw-text-disabled);
+}
+
+/* ============================ 输入 / 表单 ============================= */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field > label {
+  font: var(--pw-weight-medium) var(--pw-size-ui)/var(--pw-lh-ui)
+    var(--pw-font-sans);
+}
+.input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--pw-control-h-m);
+  padding: 0 12px;
+  background: var(--pw-surface-base);
+  border: var(--pw-width-control) solid var(--pw-border-default);
+  border-radius: var(--pw-radius-md);
+  font-size: var(--pw-size-body);
+  color: var(--pw-text-primary);
+}
+.input-l {
+  height: var(--pw-control-h-l);
+}
+.input:hover {
+  border-color: var(--pw-border-hover);
+}
+.input-focus {
+  border-color: var(--pw-border-strong);
+  outline: var(--pw-focus-ring-width) solid var(--pw-focus-ring);
+  outline-offset: var(--pw-focus-ring-offset);
+}
+.input-invalid {
+  border-color: var(--pw-negative-fill);
+}
+.input-disabled {
+  background: var(--pw-disabled-fill);
+  border-color: var(--pw-disabled-border);
+  color: var(--pw-disabled-text);
+}
+.input .ph {
+  color: var(--pw-text-tertiary);
+}
+.help {
+  font-size: var(--pw-size-aux);
+  color: var(--pw-text-secondary);
+}
+.help-error {
+  font-size: var(--pw-size-aux);
+  color: var(--pw-negative-text);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ============================ 卡片 / 面板 ============================ */
+.card {
+  background: var(--pw-surface-raised);
+  border-radius: var(--pw-radius-lg);
+  box-shadow: var(--pw-shadow-card);
+  padding: var(--pw-space-16);
+}
+.panel {
+  background: var(--pw-surface-raised);
+  border: var(--pw-width-hairline) solid var(--pw-border-hairline);
+  border-radius: var(--pw-radius-lg);
+  overflow: hidden;
+}
+.panel-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px var(--pw-space-16);
+  border-bottom: var(--pw-width-hairline) solid var(--pw-border-hairline);
+}
+
+/* ============================ 表格 ==================================== */
+.tbl {
+  font-size: var(--pw-size-body);
+}
+.tbl thead th {
+  height: var(--pw-row-head-h);
+  background: var(--pw-surface-raised);
+  text-align: left;
+  padding: 0 12px;
+  white-space: nowrap;
+  font: var(--pw-weight-semibold) var(--pw-size-table-head) /
+    var(--pw-lh-table-head) var(--pw-font-sans);
+  color: var(--pw-text-primary);
+  border-bottom: var(--pw-width-hairline) solid var(--pw-border-hairline);
+}
+.tbl tbody td {
+  height: var(--pw-row-h);
+  padding: 0 12px;
+  vertical-align: middle;
+  border-bottom: var(--pw-width-hairline) solid var(--pw-border-hairline);
+}
+.tbl tbody tr:hover td {
+  background: var(--pw-surface-hover);
+}
+.tbl tbody tr.sel td {
+  background: var(--pw-surface-selected);
+}
+.tbl .num {
+  text-align: start;
+  font-family: var(--pw-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.th-sorted {
+  color: var(--pw-text-primary) !important;
+}
+/* 采集不到数据：em dash，绝不用 0 代替 */
+.nodata {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--pw-text-tertiary);
+  font-family: var(--pw-font-mono);
+}
+
+/* ============================ 骨架屏 ================================= */
+.sk {
+  background: var(--pw-surface-sunken);
+  border-radius: var(--pw-radius-sm);
+  position: relative;
+  overflow: hidden;
+}
+.sk::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.85) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: sk-shimmer 1000ms var(--pw-ease) infinite;
+}
+@keyframes sk-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sk::after {
+    animation: none;
+  }
+}
+
+/* ============================ 反馈 ==================================== */
+.alert {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--pw-radius-md);
+  border: var(--pw-width-control) solid transparent;
+  font-size: var(--pw-size-body);
+}
+.alert .pwi {
+  margin-top: 1px;
+}
+.a-neg {
+  background: var(--pw-negative-tint);
+  border-color: var(--pw-negative-border);
+  color: var(--pw-negative-text);
+}
+.a-not {
+  background: var(--pw-notice-tint);
+  border-color: var(--pw-notice-border);
+  color: var(--pw-notice-text);
+}
+.a-inf {
+  background: var(--pw-info-tint);
+  border-color: var(--pw-info-border);
+  color: var(--pw-info-text);
+}
+.a-pos {
+  background: var(--pw-positive-tint);
+  border-color: var(--pw-positive-border);
+  color: var(--pw-positive-text);
+}
+.alert b {
+  display: block;
+  font-weight: var(--pw-weight-bold);
+}
+.alert .body {
+  color: var(--pw-text-primary);
+  font-weight: var(--pw-weight-regular);
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px var(--pw-space-24);
+  font-size: var(--pw-size-body);
+  border-bottom: var(--pw-width-hairline) solid transparent;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: var(--pw-toast-min);
+  max-width: var(--pw-toast-max);
+  padding: 12px 12px 12px 14px;
+  border-radius: var(--pw-radius-md);
+  background: var(--pw-neutral-fill);
+  color: var(--pw-text-on-fill);
+  box-shadow: var(--pw-shadow-overlay);
+  font-size: var(--pw-size-body);
+}
+
+/* ============================ 空状态 ================================= */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: var(--pw-space-64) var(--pw-space-24);
+  max-width: 420px;
+  margin: 0 auto;
+}
+.empty .pwi {
+  color: var(--pw-border-default);
+}
+.empty p {
+  margin: 0;
+  color: var(--pw-text-secondary);
+}
+
+/* ============================ 筛选标签 =============================== */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--pw-control-h-s);
+  padding: 0 8px 0 12px;
+  border-radius: var(--pw-radius-pill);
+  border: var(--pw-width-control) solid var(--pw-accent-border);
+  background: var(--pw-accent-tint);
+  color: var(--pw-accent-text-on-tint);
+  font-size: var(--pw-size-aux);
+  font-weight: var(--pw-weight-medium);
+}
+
+/* ============================ 应用框架 =============================== */
+.shell {
+  display: flex;
+  height: 100%;
+  background: var(--pw-surface-base);
+}
+.nav {
+  width: var(--pw-nav-w);
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  background: var(--pw-surface-chrome);
+  border-right: var(--pw-width-hairline) solid var(--pw-border-hairline);
+}
+.nav-collapsed {
+  width: var(--pw-nav-w-collapsed);
+}
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: var(--pw-topbar-h);
+  padding: 0 var(--pw-space-16);
+  flex: none;
+}
+/* 品牌标识位。Holm V1 为卵石形小岛，负形挖出 H，横梁为一道水波。
+   单色单一路径，作为 mask 继承文字色，不占用品牌色。
+   后续版本替换 ../assets/brand/mark.svg 即可。
+   尺寸与圆角令牌不变（26 × 26，圆角 8，与产品名称间距 10）。 */
+.brand-mark {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  background: currentColor;
+  color: var(--pw-text-primary);
+  -webkit-mask-image: url(../assets/brand/mark.svg);
+  mask-image: url(../assets/brand/mark.svg);
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  margin: 0 8px;
+  padding: 0 10px;
+  border-radius: var(--pw-radius-md);
+  position: relative;
+  color: var(--pw-text-secondary);
+  font: var(--pw-weight-medium) var(--pw-size-ui)/1 var(--pw-font-sans);
+  cursor: pointer;
+}
+.nav-item:hover {
+  background: var(--pw-surface-hover);
+  color: var(--pw-text-primary);
+}
+.nav-item.on {
+  background: var(--pw-surface-selected);
+  color: var(--pw-accent-text-on-tint);
+  font-weight: var(--pw-weight-bold);
+}
+.nav-item.on::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--pw-accent-fill);
+}
+.nav-foot {
+  margin-top: auto;
+  padding: 8px;
+  border-top: var(--pw-width-hairline) solid var(--pw-border-hairline);
+}
+.platform {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 10px;
+  border-radius: var(--pw-radius-md);
+  cursor: pointer;
+  font-size: var(--pw-size-aux);
+}
+.platform:hover {
+  background: var(--pw-surface-hover);
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: var(--pw-topbar-h);
+  flex: none;
+  padding: 0 var(--pw-space-24);
+  background: var(--pw-surface-bar);
+  border-bottom: var(--pw-width-hairline) solid var(--pw-border-hairline);
+}
+.main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.page {
+  flex: 1 1 auto;
+  overflow: auto;
+}
+.page-inner {
+  max-width: var(--pw-content-max);
+  padding: var(--pw-space-24) var(--pw-space-32) var(--pw-space-48);
+}
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding-bottom: var(--pw-space-16);
+}
+
+/* ============================ 菜单 / 弹层 ============================ */
+.menu {
+  min-width: 220px;
+  background: var(--pw-surface-overlay);
+  border-radius: var(--pw-radius-lg);
+  box-shadow: var(--pw-shadow-overlay);
+  border: var(--pw-width-hairline) solid var(--pw-border-hairline);
+  padding: 6px;
+}
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: var(--pw-radius-md);
+  color: var(--pw-text-primary);
+  font-size: var(--pw-size-body);
+  cursor: pointer;
+}
+.menu-item:hover {
+  background: var(--pw-surface-hover);
+}
+.menu-sep {
+  height: 1px;
+  background: var(--pw-border-hairline);
+  margin: 6px 4px;
+}
+
+/* ============================ 规格页专用 ============================= */
+.spec-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 40px 32px 96px;
+}
+.spec-sec {
+  padding-top: 48px;
+}
+.spec-sec > header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding-bottom: 4px;
+  border-bottom: var(--pw-width-hairline) solid var(--pw-border-hairline);
+  margin-bottom: 20px;
+}
+.spec-note {
+  font-size: var(--pw-size-aux);
+  color: var(--pw-text-secondary);
+  max-width: 76ch;
+  margin: 0 0 16px;
+  line-height: 18px;
+}
+.spec-tbl {
+  font-size: var(--pw-size-aux);
+}
+.spec-tbl th {
+  text-align: left;
+  padding: 8px 12px;
+  background: var(--pw-surface-raised);
+  border-bottom: var(--pw-width-hairline) solid var(--pw-border-hairline);
+  font: var(--pw-weight-semibold) var(--pw-size-table-head) /
+    var(--pw-lh-table-head) var(--pw-font-sans);
+  color: var(--pw-text-primary);
+  white-space: nowrap;
+}
+.spec-tbl td {
+  padding: 8px 12px;
+  border-bottom: var(--pw-width-hairline) solid var(--pw-border-hairline);
+  vertical-align: middle;
+}
+.swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  flex: none;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+.spec-grid {
+  display: grid;
+  gap: 16px;
+}
+.frame {
+  border: var(--pw-width-hairline) solid var(--pw-border-hairline);
+  border-radius: var(--pw-radius-lg);
+  overflow: hidden;
+  background: var(--pw-surface-base);
+}
+.frame-cap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--pw-surface-subtle);
+  border-bottom: var(--pw-width-hairline) solid var(--pw-border-hairline);
+  font: var(--pw-weight-medium) var(--pw-size-aux)/1 var(--pw-font-sans);
+  color: var(--pw-text-secondary);
+}

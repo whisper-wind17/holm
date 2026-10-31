@@ -1,0 +1,150 @@
+{
+  "GpuMetricValuesResponse": [
+    "health",
+    "memory_used_bytes",
+    "power_watts",
+    "temperature_celsius",
+    "utilization_percent"
+  ],
+  "GpuPointResponse": [
+    "health",
+    "memory_used_bytes",
+    "power_watts",
+    "quality",
+    "sampled_at",
+    "telemetry_status",
+    "temperature_celsius",
+    "utilization_percent"
+  ],
+  "GpuTelemetryListResponse": [
+    "items",
+    "quality",
+    "sampled_at",
+    "telemetry_status"
+  ],
+  "GpuTelemetryResponse": [
+    "current",
+    "quality",
+    "sampled_at",
+    "series",
+    "telemetry_status",
+    "uuid"
+  ],
+  "InstanceMetricValuesResponse": [
+    "kv_cache_usage_ratio",
+    "output_tps",
+    "queue_time_p50_seconds",
+    "queue_time_p95_seconds",
+    "running",
+    "ttft_p50_seconds",
+    "ttft_p95_seconds",
+    "ttft_p99_seconds",
+    "unsupported",
+    "waiting"
+  ],
+  "InstancePointResponse": [
+    "kv_cache_usage_ratio",
+    "output_tps",
+    "quality",
+    "queue_time_p50_seconds",
+    "queue_time_p95_seconds",
+    "running",
+    "sampled_at",
+    "telemetry_status",
+    "ttft_p50_seconds",
+    "ttft_p95_seconds",
+    "ttft_p99_seconds",
+    "unsupported",
+    "waiting"
+  ],
+  "InstanceTelemetryResponse": [
+    "current",
+    "instance_id",
+    "quality",
+    "sampled_at",
+    "series",
+    "telemetry_status",
+    "window_1h"
+  ],
+  "OverviewTelemetryResponse": [
+    "current",
+    "sampled_at",
+    "telemetry_status"
+  ],
+  "OverviewValuesResponse": [
+    "error_rate",
+    "error_rate_1h",
+    "gpu_allocated",
+    "gpu_available",
+    "gpu_total",
+    "requests_1h",
+    "requests_running",
+    "requests_waiting",
+    "services_available",
+    "services_starting",
+    "services_total",
+    "services_unavailable",
+    "ttft_p95_ms",
+    "window_started_at"
+  ],
+  "ServiceMetricValuesResponse": [
+    "accepted_requests",
+    "client_disconnects",
+    "e2e_latency_p50_ms",
+    "e2e_latency_p95_ms",
+    "e2e_latency_p99_ms",
+    "error_rate",
+    "error_requests",
+    "inflight_avg",
+    "inflight_last",
+    "inflight_max",
+    "output_tps_avg",
+    "output_tps_max",
+    "rejected_requests",
+    "request_rate_avg",
+    "tpot_p50_ms",
+    "tpot_p95_ms",
+    "ttft_p50_ms",
+    "ttft_p95_ms",
+    "ttft_p99_ms"
+  ],
+  "ServicePointResponse": [
+    "accepted_requests",
+    "client_disconnects",
+    "e2e_latency_p50_ms",
+    "e2e_latency_p95_ms",
+    "e2e_latency_p99_ms",
+    "error_rate",
+    "error_requests",
+    "inflight_avg",
+    "inflight_last",
+    "inflight_max",
+    "output_tps_avg",
+    "output_tps_max",
+    "quality",
+    "rejected_requests",
+    "request_rate_avg",
+    "sampled_at",
+    "telemetry_status",
+    "tpot_p50_ms",
+    "tpot_p95_ms",
+    "ttft_p50_ms",
+    "ttft_p95_ms",
+    "ttft_p99_ms"
+  ],
+  "ServiceRequestWindowResponse": [
+    "error_rate",
+    "requests",
+    "started_at",
+    "ttft_p95_ms"
+  ],
+  "ServiceTelemetryResponse": [
+    "current",
+    "quality",
+    "sampled_at",
+    "series",
+    "service_id",
+    "telemetry_status",
+    "window_1h"
+  ]
+}

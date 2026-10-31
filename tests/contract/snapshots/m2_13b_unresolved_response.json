@@ -1,0 +1,78 @@
+{
+  "$defs": {
+    "ModelSourceValidationAction": {
+      "description": "Stable operator directions derived from a validation conclusion.",
+      "enum": [
+        "update_credential",
+        "check_source_access",
+        "check_source_reference",
+        "check_source_reference_and_configure_credential",
+        "retry_later",
+        "install_validator"
+      ],
+      "title": "ModelSourceValidationAction",
+      "type": "string"
+    },
+    "ModelSourceValidationReason": {
+      "description": "Stable, sanitized reasons returned by the validation boundary.",
+      "enum": [
+        "credential_valid",
+        "credential_invalid",
+        "source_permission_denied",
+        "source_not_found",
+        "source_not_found_or_inaccessible",
+        "source_rate_limited",
+        "validator_unavailable",
+        "validation_timeout",
+        "validation_failed"
+      ],
+      "title": "ModelSourceValidationReason",
+      "type": "string"
+    },
+    "ModelSourceValidationStatus": {
+      "description": "Observable source outcomes persisted after validation.",
+      "enum": [
+        "accessible",
+        "invalid_credential",
+        "permission_denied",
+        "not_found",
+        "rate_limited"
+      ],
+      "title": "ModelSourceValidationStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "An explicit unresolved result with source validation status and reason.",
+  "properties": {
+    "next_action": {
+      "$ref": "#/$defs/ModelSourceValidationAction"
+    },
+    "outcome": {
+      "const": "unresolved",
+      "default": "unresolved",
+      "title": "Outcome",
+      "type": "string"
+    },
+    "reason_code": {
+      "$ref": "#/$defs/ModelSourceValidationReason"
+    },
+    "status": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ModelSourceValidationStatus"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "status",
+    "reason_code",
+    "next_action"
+  ],
+  "title": "UnresolvedResponse",
+  "type": "object"
+}

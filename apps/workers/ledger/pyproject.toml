@@ -1,0 +1,25 @@
+[project]
+name = "holm-ledger-writer"
+version = "0.1.0rc1"
+description = "Private AI Workspace Request Ledger replay worker"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "holm-common==0.1.0rc1",
+  "holm-domain==0.1.0rc1",
+  "holm-ledger==0.1.0rc1",
+  "holm-persistence==0.1.0rc1",
+  "sqlalchemy==2.0.52",
+]
+
+[project.scripts]
+holm-ledger-writer = "holm_ledger_writer.__main__:main"
+
+[tool.uv.sources]
+holm-common = { workspace = true }
+holm-domain = { workspace = true }
+holm-ledger = { workspace = true }
+holm-persistence = { workspace = true }
+
+[build-system]
+requires = ["uv_build==0.11.7"]
+build-backend = "uv_build"

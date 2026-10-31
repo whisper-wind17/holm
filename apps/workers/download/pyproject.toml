@@ -1,0 +1,30 @@
+[project]
+name = "holm-download-worker"
+version = "0.1.0rc1"
+description = "Private AI Workspace Download Worker application boundary"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "grpcio==1.83.1",
+  "holm-common==0.1.0rc1",
+  "holm-contracts==0.1.0rc1",
+  "holm-control-api==0.1.0rc1",
+  "holm-domain==0.1.0rc1",
+  "holm-persistence==0.1.0rc1",
+  "holm-security==0.1.0rc1",
+  "sqlalchemy==2.0.52",
+]
+
+[project.scripts]
+holm-download-worker = "holm_download_worker.__main__:main"
+
+[tool.uv.sources]
+holm-common = { workspace = true }
+holm-contracts = { workspace = true }
+holm-control-api = { workspace = true }
+holm-domain = { workspace = true }
+holm-persistence = { workspace = true }
+holm-security = { workspace = true }
+
+[build-system]
+requires = ["uv_build==0.11.7"]
+build-backend = "uv_build"

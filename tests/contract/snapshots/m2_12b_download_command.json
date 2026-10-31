@@ -1,0 +1,61 @@
+{
+  "$defs": {
+    "DownloadCommand": {
+      "enum": [
+        "pause",
+        "resume",
+        "cancel",
+        "retry"
+      ],
+      "title": "DownloadCommand",
+      "type": "string"
+    },
+    "DownloadTaskStatus": {
+      "description": "Download Task lifecycle states.",
+      "enum": [
+        "Queued",
+        "Resolving",
+        "Downloading",
+        "Paused",
+        "Verifying",
+        "Publishing",
+        "Completed",
+        "Failed",
+        "Cancelled"
+      ],
+      "title": "DownloadTaskStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "attempt": {
+      "title": "Attempt",
+      "type": "integer"
+    },
+    "command": {
+      "$ref": "#/$defs/DownloadCommand"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "staging_cleanup_requested": {
+      "title": "Staging Cleanup Requested",
+      "type": "boolean"
+    },
+    "status": {
+      "$ref": "#/$defs/DownloadTaskStatus"
+    }
+  },
+  "required": [
+    "id",
+    "status",
+    "attempt",
+    "command",
+    "staging_cleanup_requested"
+  ],
+  "title": "DownloadCommandResponse",
+  "type": "object"
+}

@@ -1,0 +1,48 @@
+{
+  "$defs": {
+    "RuntimeReadability": {
+      "description": "Whether the Runtime's own UID can read an External Root.\n\n``UNVERIFIED`` is the only member, and that is the honest shape of this\nresponse rather than a placeholder. Runtime-side path validation requires\nthe Host Agent; the read-only calls ``GetHostInfo``, ``ListGPUs`` and\n``StreamLogs`` cannot validate a path. A second member requires a wired\nvalidation call. Until then the state is stated, never omitted and never\nfolded into the accepted conclusion.",
+      "enum": [
+        "unverified"
+      ],
+      "title": "RuntimeReadability",
+      "type": "string"
+    },
+    "RuntimeReadabilityUnverifiedCause": {
+      "description": "Why the Runtime-side answer is absent.  Not an error, a known gap.",
+      "enum": [
+        "runtime_identity_check_unavailable"
+      ],
+      "title": "RuntimeReadabilityUnverifiedCause",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A server path the control plane judged usable, and what it did not judge.\n\nThe body carries no path: not the submitted value, not its ``realpath``\nand not the allowed root that matched.\n\n``runtime_readability`` is always present. Runtime-side path validation\nrequires the Host Agent and is unavailable through the read-only\n``GetHostInfo``, ``ListGPUs`` and ``StreamLogs`` methods, so the field\nstates \"unverified\" and names why.  A client that renders this\nas \"readable\" is contradicting the field, not filling a gap.",
+  "properties": {
+    "control_plane_readable": {
+      "const": true,
+      "default": true,
+      "title": "Control Plane Readable",
+      "type": "boolean"
+    },
+    "outcome": {
+      "const": "external_path_accepted",
+      "default": "external_path_accepted",
+      "title": "Outcome",
+      "type": "string"
+    },
+    "runtime_readability": {
+      "$ref": "#/$defs/RuntimeReadability"
+    },
+    "runtime_readability_cause": {
+      "$ref": "#/$defs/RuntimeReadabilityUnverifiedCause"
+    }
+  },
+  "required": [
+    "runtime_readability",
+    "runtime_readability_cause"
+  ],
+  "title": "ExternalPathAcceptedResponse",
+  "type": "object"
+}

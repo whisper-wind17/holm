@@ -1,0 +1,257 @@
+syntax = "proto3";
+
+package holm.agent.v1;
+
+enum KnowledgeState {
+  KNOWLEDGE_STATE_UNSPECIFIED = 0;
+  KNOWLEDGE_STATE_UNKNOWN = 1;
+  KNOWLEDGE_STATE_KNOWN = 2;
+}
+
+message ObservedUInt64 {
+  KnowledgeState state = 1;
+  optional uint64 value = 2;
+}
+
+enum ObservationUnknownReason {
+  OBSERVATION_UNKNOWN_REASON_UNSPECIFIED = 0;
+  OBSERVATION_UNKNOWN_REASON_NOT_COLLECTED = 1;
+  OBSERVATION_UNKNOWN_REASON_SOURCE_UNAVAILABLE = 2;
+  OBSERVATION_UNKNOWN_REASON_EMPTY_VALUE = 3;
+  OBSERVATION_UNKNOWN_REASON_QUERY_FAILED = 4;
+}
+
+message ObservedString {
+  KnowledgeState state = 1;
+  optional string value = 2;
+  ObservationUnknownReason unknown_reason = 3;
+}
+
+message ObservedGpuUuids {
+  KnowledgeState state = 1;
+  repeated string values = 2;
+  ObservationUnknownReason unknown_reason = 3;
+}
+
+message GetHostInfoRequest {}
+
+message GetHostInfoResponse {
+  ObservedUInt64 logical_cpu_count = 1;
+  ObservedUInt64 total_memory_bytes = 2;
+  ObservedUInt64 total_disk_bytes = 3;
+  ObservedUInt64 available_disk_bytes = 4;
+  ObservedString driver_version = 5;
+  ObservedString docker_version = 6;
+  ObservedString toolkit_version = 7;
+  ObservedString cuda_driver_version = 8;
+  ObservedString compose_version = 9;
+}
+
+enum GpuDiscoveryState {
+  GPU_DISCOVERY_STATE_UNSPECIFIED = 0;
+  GPU_DISCOVERY_STATE_READY = 1;
+  GPU_DISCOVERY_STATE_NO_DEVICES = 2;
+  GPU_DISCOVERY_STATE_UNAVAILABLE = 3;
+}
+
+enum GpuDiscoveryFailureReason {
+  GPU_DISCOVERY_FAILURE_REASON_UNSPECIFIED = 0;
+  GPU_DISCOVERY_FAILURE_REASON_NO_DEVICES = 1;
+  GPU_DISCOVERY_FAILURE_REASON_LIBRARY_UNAVAILABLE = 2;
+  GPU_DISCOVERY_FAILURE_REASON_DRIVER_UNAVAILABLE = 3;
+  GPU_DISCOVERY_FAILURE_REASON_PERMISSION_DENIED = 4;
+  GPU_DISCOVERY_FAILURE_REASON_INITIALIZATION_FAILED = 5;
+  GPU_DISCOVERY_FAILURE_REASON_ENUMERATION_FAILED = 6;
+  GPU_DISCOVERY_FAILURE_REASON_SNAPSHOT_CHANGED = 7;
+}
+
+enum GpuHealthState {
+  GPU_HEALTH_STATE_UNSPECIFIED = 0;
+  GPU_HEALTH_STATE_HEALTHY = 1;
+  GPU_HEALTH_STATE_UNHEALTHY = 2;
+  GPU_HEALTH_STATE_UNKNOWN = 3;
+}
+
+enum GpuHealthReason {
+  GPU_HEALTH_REASON_UNSPECIFIED = 0;
+  GPU_HEALTH_REASON_ECC_ERRORS_DETECTED = 1;
+  GPU_HEALTH_REASON_QUERY_UNSUPPORTED = 2;
+  GPU_HEALTH_REASON_QUERY_FAILED = 3;
+}
+
+enum TopologyState {
+  TOPOLOGY_STATE_UNSPECIFIED = 0;
+  TOPOLOGY_STATE_PRESENT = 1;
+  TOPOLOGY_STATE_ABSENT = 2;
+  TOPOLOGY_STATE_UNSUPPORTED = 3;
+  TOPOLOGY_STATE_QUERY_FAILED = 4;
+}
+
+enum PcieRelation {
+  PCIE_RELATION_UNSPECIFIED = 0;
+  PCIE_RELATION_INTERNAL = 1;
+  PCIE_RELATION_SINGLE_SWITCH = 2;
+  PCIE_RELATION_MULTIPLE_SWITCHES = 3;
+  PCIE_RELATION_HOST_BRIDGE = 4;
+  PCIE_RELATION_NUMA_NODE = 5;
+  PCIE_RELATION_SYSTEM = 6;
+}
+
+message GpuDevice {
+  string uuid = 1;
+  optional uint32 display_index = 2;
+  string model = 3;
+  uint64 memory_bytes = 4;
+  GpuHealthState health = 5;
+  repeated GpuHealthReason health_reasons = 6;
+  optional double utilization_percent = 7;
+  optional uint64 memory_used_bytes = 8;
+  optional double temperature_celsius = 9;
+  optional double power_watts = 10;
+}
+
+message GpuTopologyLink {
+  string gpu_a_uuid = 1;
+  string gpu_b_uuid = 2;
+  TopologyState pcie_state = 3;
+  optional PcieRelation pcie_relation = 4;
+  TopologyState nvlink_state = 5;
+  TopologyState p2p_read_state = 6;
+}
+
+message ListGPUsRequest {}
+message ListGPUsResponse {
+  GpuDiscoveryState discovery_state = 1;
+  GpuDiscoveryFailureReason failure_reason = 2;
+  optional string snapshot_id = 3;
+  repeated GpuDevice devices = 4;
+  repeated GpuTopologyLink topology_links = 5;
+}
+enum RuntimeProcessState {
+  RUNTIME_PROCESS_STATE_UNSPECIFIED = 0;
+  RUNTIME_PROCESS_STATE_RUNNING = 1;
+  RUNTIME_PROCESS_STATE_EXITED = 2;
+  RUNTIME_PROCESS_STATE_NOT_FOUND = 3;
+}
+
+message EnsureRuntimeRequest {
+  string instance_id = 1;
+  string runtime_name = 2;
+  string model_path = 3;
+  repeated string gpu_uuids = 4;
+  uint32 tensor_parallel_size = 5;
+  uint32 context_length = 6;
+  double gpu_memory_utilization = 7;
+  string served_model_name = 8;
+  string config_version = 9;
+}
+
+message EnsureRuntimeResponse {
+  RuntimeProcessState status = 1;
+  string endpoint = 2;
+}
+
+message StopRuntimeRequest {
+  string instance_id = 1;
+  uint32 grace_seconds = 2;
+}
+
+message StopRuntimeResponse {
+  RuntimeProcessState status = 1;
+}
+message RemoveRuntimeRequest {
+  string instance_id = 1;
+}
+message RemoveRuntimeResponse {}
+message InspectRuntimeRequest {
+  string instance_id = 1;
+}
+
+message InspectRuntimeResponse {
+  RuntimeProcessState status = 1;
+  optional int32 exit_code = 2;
+  string endpoint = 3;
+  string started_at = 4;
+  ObservedGpuUuids gpu_uuids = 5;
+  optional bool oom_killed = 6;
+}
+message ListRuntimesRequest {}
+message RuntimeSummary {
+  string instance_id = 1;
+  RuntimeProcessState status = 2;
+  ObservedGpuUuids gpu_uuids = 3;
+}
+message ListRuntimesResponse { repeated RuntimeSummary runtimes = 1; }
+message StreamLogsRequest {
+  string instance_id = 1;
+  uint64 cursor_offset = 2;
+  uint32 page_size = 3;
+}
+
+message LogEntry {
+  uint64 sequence = 1;
+  string text = 2;
+  bool truncated = 3;
+  uint64 original_character_count = 4;
+}
+
+message StreamLogsResponse {
+  repeated LogEntry entries = 1;
+  uint64 next_cursor_offset = 2;
+  bool has_more = 3;
+}
+// Whether the *Runtime's* UID can read a server path.  The
+// answer is derived from POSIX mode bits, never by opening anything as another
+// UID, so it has a side that can be trusted and a side that cannot: a mode bit
+// that withholds permission withholds it, while a mode bit that grants it can
+// still be overruled by an ACL the derivation cannot see.  The known/unknown
+// shape below is the one already used by ObservedString and ObservedUInt64;
+// there is no second way to say "unknown" in this service.
+enum RuntimeReadability {
+  RUNTIME_READABILITY_UNSPECIFIED = 0;
+  RUNTIME_READABILITY_READABLE = 1;
+  RUNTIME_READABILITY_NOT_READABLE = 2;
+}
+
+enum RuntimeReadabilityUnknownReason {
+  RUNTIME_READABILITY_UNKNOWN_REASON_UNSPECIFIED = 0;
+  // The Release Manifest states no Runtime identity, so there is no UID to
+  // derive an answer for.  It never falls back to the Agent's own UID.
+  RUNTIME_READABILITY_UNKNOWN_REASON_RUNTIME_IDENTITY_UNAVAILABLE = 1;
+  // The derivation says readable, but the path chain carries extended
+  // attributes, which can carry an ACL that overrules the mode bits.
+  RUNTIME_READABILITY_UNKNOWN_REASON_ACL_PRESENT = 2;
+}
+
+message ObservedRuntimeReadability {
+  KnowledgeState state = 1;
+  optional RuntimeReadability value = 2;
+  RuntimeReadabilityUnknownReason unknown_reason = 3;
+}
+
+// One path and nothing else.  A caller that could name the UID, the GID or the
+// allowed roots would be choosing its own answer; the Agent takes the Runtime
+// identity from the Release Manifest and the allowed roots from its own
+// configuration.
+message ValidatePathRequest {
+  string path = 1;
+}
+
+// "Does not exist", "outside the allowed roots" and "the mode bits refuse" are
+// deliberately the same answer: each distinguishable reply is one bit about a
+// directory the caller cannot otherwise see.
+message ValidatePathResponse {
+  ObservedRuntimeReadability runtime_readability = 1;
+}
+
+service HostAgent {
+  rpc GetHostInfo(GetHostInfoRequest) returns (GetHostInfoResponse);
+  rpc ListGPUs(ListGPUsRequest) returns (ListGPUsResponse);
+  rpc EnsureRuntime(EnsureRuntimeRequest) returns (EnsureRuntimeResponse);
+  rpc StopRuntime(StopRuntimeRequest) returns (StopRuntimeResponse);
+  rpc RemoveRuntime(RemoveRuntimeRequest) returns (RemoveRuntimeResponse);
+  rpc InspectRuntime(InspectRuntimeRequest) returns (InspectRuntimeResponse);
+  rpc ListRuntimes(ListRuntimesRequest) returns (ListRuntimesResponse);
+  rpc StreamLogs(StreamLogsRequest) returns (stream StreamLogsResponse);
+  rpc ValidatePath(ValidatePathRequest) returns (ValidatePathResponse);
+}

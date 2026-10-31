@@ -1,0 +1,107 @@
+{
+  "answers": {
+    "concurrency_question_answered": true,
+    "does_concurrency_increase_cpu_per_request": false,
+    "function_level_composition_answered": false,
+    "function_level_unanswered_reason": "sys.monitoring exceeded the 30% disturbance limit; cProfile was already distorted"
+  },
+  "case": "PERF-03-GATEWAY-CPU-PROFILE",
+  "clean_concurrency_32_minus_1_cpu_ms_per_request": -2.114304,
+  "commit": "3fea46fdd3b02a31de0eca79a29352a20ecf264b",
+  "distortion_evidence": {
+    "cprofile_first_leg": {
+      "concurrency_1": {
+        "amplification_factor": 2.93316,
+        "control_cpu_ms_per_request": 6.946613,
+        "overhead_percent": 193.316,
+        "profiled_cpu_ms_per_request": 20.375525
+      },
+      "concurrency_32": {
+        "amplification_factor": 4.96784,
+        "control_cpu_ms_per_request": 6.149889,
+        "overhead_percent": 396.784,
+        "profiled_cpu_ms_per_request": 30.551683
+      },
+      "method": "cProfile + pstats"
+    },
+    "sys_monitoring_threshold_percent": 30.0
+  },
+  "environment": {
+    "cpu": "x86_64",
+    "host": "a034f1cc1654",
+    "load_after": {
+      "load_1m": 1.99,
+      "uptime": "13:15:04 up 25 days, 10:11,  0 user,  load average: 1.99, 2.47, 3.36"
+    },
+    "load_before": {
+      "load_1m": 1.73,
+      "uptime": "13:14:27 up 25 days, 10:11,  0 user,  load average: 1.73, 2.50, 3.41"
+    },
+    "memory_mib": 515544,
+    "python": "3.12.3"
+  },
+  "measured_at": "2026-09-22T13:15:04.518178+00:00",
+  "method": {
+    "attribution": "process CPU intervals between lifecycle events on the Gateway loop thread",
+    "default_enabled": false,
+    "events": [
+      "PY_START",
+      "PY_RESUME",
+      "PY_RETURN",
+      "PY_YIELD",
+      "PY_UNWIND"
+    ],
+    "maximum_acceptable_overhead_percent": 30.0,
+    "production_gateway_hook": false,
+    "profiler": "sys.monitoring (PEP 669)",
+    "timer": "time.process_time_ns"
+  },
+  "points": [
+    {
+      "attributed_process_cpu_percent": 99.609237,
+      "batches": 128,
+      "concurrency": 1,
+      "control_process_cpu_ms_per_request": 6.716908,
+      "control_process_cpu_seconds": 0.859764264,
+      "monitored_process_cpu_ms_per_request": 41.968721,
+      "monitored_process_cpu_seconds": 5.37199635,
+      "monitoring_amplification_factor": 6.24822,
+      "monitoring_events": 1728454,
+      "monitoring_overhead_percent": 524.822,
+      "requests": 128,
+      "stack_mismatches": 8364
+    },
+    {
+      "attributed_process_cpu_percent": 99.950333,
+      "batches": 4,
+      "concurrency": 32,
+      "control_process_cpu_ms_per_request": 4.602604,
+      "control_process_cpu_seconds": 0.589133283,
+      "monitored_process_cpu_ms_per_request": 48.379207,
+      "monitored_process_cpu_seconds": 6.192538491,
+      "monitoring_amplification_factor": 10.511269,
+      "monitoring_events": 2102530,
+      "monitoring_overhead_percent": 951.127,
+      "requests": 128,
+      "stack_mismatches": 4308
+    }
+  ],
+  "status": "FALLBACK_DISTORTED",
+  "workload": {
+    "concurrencies": [
+      1,
+      32
+    ],
+    "edge_in_path": false,
+    "gateway_max_inflight": 256,
+    "process_topology": {
+      "client": "8 processes; one event loop per process; one keep-alive connection per concurrent slot and path",
+      "gateway": "dedicated process",
+      "stub_runtime": "8 SO_REUSEPORT worker processes on one endpoint"
+    },
+    "request_mix": "100% streaming chat completions, one output token",
+    "requests_per_point": 128,
+    "stub_fixture": "FX-RT-03",
+    "warmup_requests": 200
+  }
+}

@@ -1,0 +1,23 @@
+HTTP/2 401 
+content-type: application/json; charset=utf-8
+content-length: 41
+date: Thu, 03 Sep 2026 06:14:28 GMT
+etag: W/"29-dEMcHWfJi78ZR1aqzb1ELAhp3Us"
+x-powered-by: huggingface-moon
+x-request-id: Root=1-6a991044-6b26c8a848f73bf86d76939e
+ratelimit: "api";r=499;t=274
+ratelimit-policy: "fixed window";"api";q=500;w=300
+cross-origin-opener-policy: same-origin
+referrer-policy: strict-origin-when-cross-origin
+access-control-max-age: 86400
+access-control-allow-origin: https://huggingface.co
+vary: Origin
+access-control-expose-headers: X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash
+x-error-message: Invalid username or password.
+www-authenticate: Bearer realm="Authentication required", charset="UTF-8"
+x-cache: Error from cloudfront
+via: 1.1 b7f2e03ea82ba959032d68c9a16e911e.cloudfront.net (CloudFront)
+x-amz-cf-pop: LAX53-P4
+alt-svc: h3=":443"; ma=86400
+x-amz-cf-id: n_sS0KWnDXxDG-h-CoX010OKZS-V5cVZXJ9S5qthBgima0CyfmtHWw==
+strict-transport-security: max-age=31536000
